@@ -19,8 +19,8 @@ public class MathExample {
     
     public static void main(String[] args){
         
-        Complex a = new Complex("12 + 5i");
-        Complex b = new Complex("2 - 12i");
+        Complex a = new Complex(12, 5);
+        Complex b = new Complex(2, -12);
         
         Debug.Log(a.add(b));
         

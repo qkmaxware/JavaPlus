@@ -6,10 +6,10 @@
 package Examples;
 
 import plus.structures.BinaryTree;
-import plus.system.Function;
 import java.util.LinkedList;
 import plus.structures.TreeNode;
 import plus.system.Debug;
+import plus.system.functional.*;
 
 /**
  *
@@ -23,14 +23,11 @@ public class FunctionExample {
         
         //Create the binary tree
         BinaryTree<Integer> number = new BinaryTree<Integer>(5);
-        Function insertFn = new Function(){
-            public Integer Call(Object... args) {
-                TreeNode<Integer> parent = (TreeNode<Integer>)args[0];
-                Integer val = (Integer)args[1];
-                if(val < parent.GetValue())
+                
+        Func2<TreeNode<Integer>,Integer, Integer> insertFn = (node, val) -> {
+                if(val < node.GetValue())
                     return 0;
                 else return 1;
-            }
         };
         
         //Use function to insert values into our trees at the desired position
@@ -46,26 +43,16 @@ public class FunctionExample {
         LinkedList<TreeNode<Integer>> lessThanFive = new LinkedList<>();
         
         //Create functions which we will use to filter through our tree
-        Function filterFn = new Function(){
-            @Override
-            public Object Call(Object... args) {
-                if(((TreeNode<Integer>)args[0]).GetValue() <= 5)
-                    lessThanFive.add((TreeNode<Integer>)args[0]);
-                return null;
-            }  
-        };
-        
-        Function sumFn = new Function(){
-            public Object Call(Object... args) {
-                if(args[0] != null)
-                    sum += ((TreeNode<Integer>)args[0]).GetValue();
-                return null;
-            }
-        };
-        
+
         //Run through the tree and perform an actions on each node
-        number.GetRoot().PreOrderCascade(sumFn);
-        number.GetRoot().PreOrderCascade(filterFn);
+        number.GetRoot().PreOrderCascade((node) -> {
+            if(node != null)
+                sum += (node).GetValue();
+        });
+        number.GetRoot().PreOrderCascade((node) -> {
+            if((node).GetValue() <= 5)
+                    lessThanFive.add(node);
+        });
         
         Debug.Log("Sum: "+sum);
         Debug.Log("There are: "+lessThanFive.size()+" numbers less than 5");

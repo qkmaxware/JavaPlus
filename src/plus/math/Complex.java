@@ -31,21 +31,6 @@ public class Complex{
         this.real = 0;
         this.img = 0;
     }
-    
-    /**
-     * Create a complex number from a string representation
-     * @param str 
-     */
-    public Complex(String str){
-        String s[] = str.split("[\\Q+-\\Ei]");
-        this.real = 0; this.img = 0;
-        
-        if(s.length > 0)
-            this.real = Float.parseFloat(s[0]);
-        if(s.length > 1)
-            this.img = Float.parseFloat(s[1]);
-        
-    }
 
     /**
      * The complex conjugate of this number

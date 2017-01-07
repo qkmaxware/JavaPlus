@@ -5,7 +5,7 @@
  */
 package plus.structures;
 
-import plus.system.Function;
+import plus.system.functional.*;
 
 /**
  *
@@ -66,8 +66,8 @@ public class TreeNode<T> {
      * @param fn takes the current node and the inserted value as its parameters 
      * @param Value 
      */
-    public void InsertChild(Function fn, T Value){
-        Integer child = (Integer)fn.Call(this,Value);
+    public void InsertChild(Func2<TreeNode<T>, T, Integer> fn, T Value){
+        Integer child = (Integer)fn.Invoke(this,Value);
         if(this.children[child] != null){
             this.children[child].InsertChild(fn, Value);
         }else{
@@ -79,8 +79,8 @@ public class TreeNode<T> {
      * Cascade down this node and its children in calling the function at every node.
      * @param fn takes the current node a its only parameter
      */
-    public void PreOrderCascade(Function fn){
-        fn.Call(this);
+    public void PreOrderCascade(Action1<TreeNode<T>> fn){
+        fn.Invoke(this);
         for(TreeNode<T> child : this.children){
             if(child != null)
                 child.PreOrderCascade(fn);
@@ -91,12 +91,12 @@ public class TreeNode<T> {
      * Cascade down this node and its children in calling the function at every node.
      * @param fn takes the current node a its only parameter
      */
-    public void PostOrderCascade(Function fn){
+    public void PostOrderCascade(Action1<TreeNode<T>> fn){
         for(TreeNode<T> child : this.children){
             if(child != null)
                 child.PreOrderCascade(fn);
         }
-        fn.Call(this);
+        fn.Invoke(this);
     }
     
     public String toString(){

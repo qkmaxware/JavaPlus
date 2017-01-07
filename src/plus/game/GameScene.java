@@ -8,9 +8,9 @@ package plus.game;
 import plus.graphics.Camera;
 import plus.graphics.RenderObject;
 import plus.graphics.Scene;
-import plus.graphics.Transform;
 import plus.physics.Simulation;
 import java.util.LinkedList;
+import plus.system.functional.Action2;
 
 /**
  *
@@ -85,22 +85,22 @@ public class GameScene{
         
         protected void EarlyUpdate(double deltatime){
             for(GameObject obj : this.objs)
-            for(UpdateListener event : obj.early_events){
-                event.Update(obj,deltatime);
+            for(Action2<GameObject, Double> event : obj.early_events){
+                event.Invoke(obj,deltatime);
             }
         }
         
         protected void Update(double deltatime){
             for(GameObject obj : this.objs)
-            for(UpdateListener event : obj.update_events){
-                event.Update(obj,deltatime);
+            for(Action2<GameObject, Double> event : obj.update_events){
+                event.Invoke(obj,deltatime);
             }
         }
         
         protected void LateUpdate(double deltatime){
             for(GameObject obj : this.objs)
-            for(UpdateListener event : obj.late_events){
-                event.Update(obj,deltatime);
+            for(Action2<GameObject, Double> event : obj.late_events){
+                event.Invoke(obj,deltatime);
             }
         }
         

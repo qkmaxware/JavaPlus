@@ -8,6 +8,7 @@ package plus.game;
 import plus.graphics.RenderObject;
 import plus.graphics.Transform;
 import java.util.LinkedList;
+import plus.system.functional.Action2;
 
 /**
  *
@@ -22,9 +23,9 @@ public class GameObject{
     private RenderObject renderable;
     private plus.physics.Body body;
     
-    protected LinkedList<UpdateListener> update_events = new LinkedList<UpdateListener>();
-    protected LinkedList<UpdateListener> early_events = new LinkedList<UpdateListener>();
-    protected LinkedList<UpdateListener> late_events = new LinkedList<UpdateListener>();
+    protected LinkedList<Action2<GameObject, Double>> update_events = new LinkedList<Action2<GameObject, Double>>();
+    protected LinkedList<Action2<GameObject, Double>> early_events = new LinkedList<Action2<GameObject, Double>>();
+    protected LinkedList<Action2<GameObject, Double>> late_events = new LinkedList<Action2<GameObject, Double>>();
     
     public GameObject(String name){
         this.name = name;
@@ -56,7 +57,7 @@ public class GameObject{
      * Add an update listener
      * @param lisntener 
      */
-    public void OnUpdate(UpdateListener listener){
+    public void OnUpdate(Action2<GameObject, Double> listener){
         update_events.add(listener);
     }
     
@@ -64,7 +65,7 @@ public class GameObject{
      * Remove an update listener
      * @param listener 
      */
-    public void RemoveUpdate(UpdateListener listener){
+    public void RemoveUpdate(Action2<GameObject, Double> listener){
         update_events.remove(listener);
     }
     
@@ -72,7 +73,7 @@ public class GameObject{
      * Add an early update listener
      * @param lisntener 
      */
-    public void OnEarlyUpdate(UpdateListener listener){
+    public void OnEarlyUpdate(Action2<GameObject, Double> listener){
         early_events.add(listener);
     }
     
@@ -80,7 +81,7 @@ public class GameObject{
      * Remove an early update listener
      * @param listener 
      */
-    public void RemoveEarlyUpdate(UpdateListener listener){
+    public void RemoveEarlyUpdate(Action2<GameObject, Double> listener){
         early_events.remove(listener);
     }
     
@@ -88,7 +89,7 @@ public class GameObject{
      * Add a late update listener
      * @param lisntener 
      */
-    public void OnLateUpdate(UpdateListener listener){
+    public void OnLateUpdate(Action2<GameObject, Double> listener){
         late_events.add(listener);
     }
     
@@ -96,7 +97,7 @@ public class GameObject{
      * Remove a late update listener
      * @param listener 
      */
-    public void RemoveLateUpdate(UpdateListener listener){
+    public void RemoveLateUpdate(Action2<GameObject, Double> listener){
         late_events.remove(listener);
     }
 }

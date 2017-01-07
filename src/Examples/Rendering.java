@@ -58,10 +58,7 @@ public class Rendering {
         game.GetSceneManager().LoadScene(scene);                    //Set the active scene
         scene.camera = cam;
 
-        cameraObj.OnUpdate(new UpdateListener(){                    //Add an update event to the game. Update called every frame
-            Vector3 oldmouse = game.input.MouseLocation();
-            @Override
-            public void Update(GameObject obj, double deltatime) {
+        cameraObj.OnUpdate((obj, deltatime) -> {
                 //Camera movement -- fly camera behavior
                 Vector3 movement = Vector3.zero;
                 if(game.input.KeyDown(KeyEvent.VK_W)){
@@ -99,7 +96,6 @@ public class Rendering {
                 //Framerate independance for movement -- speed 12
                 Vector3 delta = movement.scale(12*deltatime);
                 obj.GetTransform().SetLocalPosition(obj.GetTransform().GetLocalPosition().add(delta));
-            }
         });
         
         //Basic SWING components to house the engine

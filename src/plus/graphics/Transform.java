@@ -8,7 +8,7 @@ package plus.graphics;
 import plus.math.Matrix;
 import plus.math.Quaternion;
 import plus.math.Vector3;
-import plus.system.Function;
+import plus.system.functional.*;
 import java.util.LinkedList;
 
 /**
@@ -432,8 +432,8 @@ public class Transform {
      * Call a function for this object and each of it's children
      * @param fn 
      */
-    public void Cascade(Function fn){
-        fn.Call(this);
+    public void Cascade(Action1<Transform> fn){
+        fn.Invoke(this);
         for(Transform child : this.GetChildren()){
             child.Cascade(fn);
         }
