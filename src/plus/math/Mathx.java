@@ -9,7 +9,7 @@ package plus.math;
  *
  * @author Colin Halseth
  */
-public class Util {
+public class Mathx {
     
     /**
      * Convert degrees to radians

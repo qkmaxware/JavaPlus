@@ -10,6 +10,7 @@ import plus.graphics.RenderObject;
 import plus.graphics.Scene;
 import plus.physics.Simulation;
 import java.util.LinkedList;
+import plus.graphics.gui.Ui;
 import plus.system.functional.Action2;
 
 /**
@@ -27,6 +28,9 @@ public class GameScene{
         private LinkedList<GameObject> objs = new LinkedList<GameObject>();
         private LinkedList<GameObject> created = new LinkedList<GameObject>();
         private LinkedList<GameObject> destroyed = new LinkedList<GameObject>();
+        
+        private LinkedList<Ui> overlay_adds = new LinkedList<Ui>();
+        private LinkedList<Ui> overlay_destroys = new LinkedList<Ui>();
         
         //private LinkedList<GameObject> backup_objs = new LinkedList<GameObject>();
         //private LinkedList<Transform> backup_transforms = new LinkedList<Transform>();
@@ -65,6 +69,22 @@ public class GameScene{
         }
         
         /**
+         * Add a UI overlay element
+         * @param ui 
+         */
+        public void AddUi(Ui ui){
+            overlay_adds.add(ui);
+        }
+        
+        /**
+         * Remove a UI overlay element
+         * @param ui 
+         */
+        public void RemoveUi(Ui ui){
+            this.overlay_destroys.add(ui);
+        }
+        
+        /**
          * INTERNAL, resolve the instanciation and destruction queues
          */
         protected void ResolveQueue(){
@@ -78,6 +98,12 @@ public class GameScene{
                 if(obj.GetRenderable() != null)
                 this.scene.Remove((RenderObject)obj.GetRenderable());
             }
+            for(Ui obj : this.overlay_adds){
+                this.scene.AddUi(obj);
+            }
+            for(Ui obj : this.overlay_destroys){
+                this.scene.RemoveUi(obj);
+            }       
             
             created.clear();
             destroyed.clear();

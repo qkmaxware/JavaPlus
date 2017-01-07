@@ -32,7 +32,7 @@ public class MathExample {
         });
         Debug.Log(m);
         
-        Debug.Log(plus.math.Util.Factorial(5));
+        Debug.Log(plus.math.Mathx.Factorial(5));
         
         Debug.Log(Random.Range(0.0f, 120f));
         

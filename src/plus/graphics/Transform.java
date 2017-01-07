@@ -278,8 +278,9 @@ public class Transform {
         //localToWorld --> trans * scale * rotY * rotX * rotZ
         double x = position.x(); double y = position.y(); double z = position.z();
         double l = scale.x(); double j = scale.y(); double k = scale.z();
+        //TODO use quaterionons only, don't convert to EulerAngles
         Vector3 rotation = this.rotation.ToEulerAngle();
-        double a = plus.math.Util.DegreesToRadians(rotation.x()); double b = plus.math.Util.DegreesToRadians(rotation.y()); double g = plus.math.Util.DegreesToRadians(rotation.z());
+        double a = plus.math.Mathx.DegreesToRadians(rotation.x()); double b = plus.math.Mathx.DegreesToRadians(rotation.y()); double g = plus.math.Mathx.DegreesToRadians(rotation.z());
         this.localToWorldMatrix = new Matrix(
                 new double[][]
                 {
@@ -437,5 +438,34 @@ public class Transform {
         for(Transform child : this.GetChildren()){
             child.Cascade(fn);
         }
+    }
+    
+    /**
+     * Rotate this transform around a point in world-space
+     * @param pivot
+     * @param angle 
+     */
+    public void RotateAround(Vector3 pivot, Quaternion angle){
+        Vector3 dir = this.GetPosition().sub(pivot);
+        dir = angle.mul(dir);
+        Vector3 point = dir.add(pivot);
+        this.SetPosition(point);
+    }
+    
+    /**
+     * Align this tranform's forward vector to be facing a point in world-space
+     * @param position 
+     */
+    public void LookAt(Vector3 position){
+        Vector3 w =(position.sub(this.GetPosition())).Normalize();
+        Vector3 a = Vector3.Cross(Vector3.forward, w);
+        double theta = Math.acos(Vector3.Dot(Vector3.forward, w));
+        Quaternion q = new Quaternion(
+                a.x() * Math.sin(theta/2),
+                a.y() * Math.sin(theta/2),
+                a.z() * Math.sin(theta/2),
+                Math.cos(theta/2)
+        );
+        this.SetRotation(q);
     }
 }

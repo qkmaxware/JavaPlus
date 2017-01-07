@@ -10,10 +10,14 @@ import plus.math.Vector3;
 import plus.graphics.Bitmap;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
+import plus.math.Pair;
 
 /**
  *
@@ -66,105 +70,11 @@ public class Resources {
      * Note uv loading still needs some work, seems to miss 1/2 of the coodinates
      * @param fname 
      */
-    public static void LoadObject(String fname){
-       
-       String geom = null;
-       LinkedList<Vector3> vertices = new LinkedList<Vector3>();
-       LinkedList<Integer> faces = new LinkedList<Integer>();
-       LinkedList<Vector3> uvs = new LinkedList<Vector3>();
-       LinkedList<Vector3> loadeduvs = new LinkedList<Vector3>();
-       
+    public static void LoadObject(String fname){ 
        try {
-            File f = new File(fname);
-            String filename = fname.replaceAll(".*\\/|\\..*$","").trim();
-              
-            Scanner reader = new Scanner(f);
-            while(reader.hasNextLine()){
-                String line = reader.nextLine();
-                if(line.startsWith("o ")){
-                    String[] values = line.split(" ");
-                    if(geom != null){
-                        //Push and reset lists;
-                        Vector3[] verts = new Vector3[vertices.size()];
-                        Integer[] tris = new Integer[faces.size()];
-                        int[] trisI = new int[faces.size()];
-                        Vector3[] uv = new Vector3[uvs.size()];
-                        vertices.toArray(verts);
-                        faces.toArray(tris);
-                        uvs.toArray(uv);
-                        for(int i = 0; i < trisI.length; i++){
-                            trisI[i] = (int)tris[i];
-                        }
-                        geoms.put(geom,
-                                new Geometry(
-                                        verts,
-                                        trisI,
-                                        uv
-                                )
-                                );
-                        System.out.println(geom);
-                        geom = null;
-                    }
-                    geom = line.substring(2).trim();
-                }
-                else if(line.startsWith("v ")){
-                    String[] values = line.split(" ");
-                    vertices.add(new Vector3(
-                            Float.parseFloat(values[1]),
-                            Float.parseFloat(values[2]),
-                            Float.parseFloat(values[3])
-                    ));
-                }
-                else if(line.startsWith("f ")){
-                    String[] values = line.split(" ");
-                    
-                    String[] first = values[1].split("/");
-                    String[] sec = values[2].split("/");
-                    String[] third = values[3].split("/");
-                    
-                    //Blender exports .obj as 1 indexed, convert to 0 indexed
-                    // [vertex coordinate, texture coordinate index, vertex normal index]
-                    faces.add(Integer.parseInt(first[0])-1);
-                    faces.add(Integer.parseInt(sec[0])-1);
-                    faces.add(Integer.parseInt(third[0])-1);
-                    try{ //Try uvs...may not have any
-                        uvs.add(loadeduvs.get(Integer.parseInt(first[1]) -1));
-                        uvs.add(loadeduvs.get(Integer.parseInt(sec[1]) -1));
-                        uvs.add(loadeduvs.get(Integer.parseInt(third[1]) -1));
-                    }
-                    catch(Exception e){}
-                }
-                else if(line.startsWith("vt ")){
-                    String[] values = line.split(" ");
-                    loadeduvs.add(new Vector3(
-                            Float.parseFloat(values[1]),
-                            Float.parseFloat(values[2])
-                    ));
-                }
-            }
-            
-            //Final push if any geometry remains
-            if(geom != null){
-                //Push and reset lists;
-                Vector3[] verts = new Vector3[vertices.size()];
-                Integer[] tris = new Integer[faces.size()];
-                int[] trisI = new int[faces.size()];
-                Vector3[] uv = new Vector3[uvs.size()];
-                vertices.toArray(verts);
-                faces.toArray(tris);
-                uvs.toArray(uv);
-                for(int i = 0; i < trisI.length; i++){
-                    trisI[i] = (int)tris[i];
-                }
-                geoms.put(geom,
-                        new Geometry(
-                                verts,
-                                trisI,
-                                uv
-                        )
-                        );
-            }
-            
+            for(Pair<String, Geometry> obj : ObjParser.Parse((String[])Files.readAllLines(Paths.get(fname)).toArray())){
+                geoms.put(obj.GetLeft(), obj.GetRight());
+            } 
         } catch (Exception e) {
             System.out.println("Resource: [\"" + fname + "\"] failed to load because");
             e.printStackTrace();

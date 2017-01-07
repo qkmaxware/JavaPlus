@@ -166,7 +166,7 @@ public class Camera extends Transform{
     public void RebuildMatrices(){
         
         //compute focal length specific projection variables #WIP ext.math.Util.atanf
-        double fov = Math.tan(plus.math.Util.DegreesToRadians(focallength)*0.5f);
+        double fov = Math.tan(plus.math.Mathx.DegreesToRadians(focallength)*0.5f);
         double zoom = 1/fov;
         double aspect = this.GetWidth()/this.GetHeight();
         double z1 = (f + n)/(n - f);
@@ -383,11 +383,11 @@ public class Camera extends Transform{
             Vector3 d = new Vector3(
                     (a.x()) + ((b.y() - a.y()) / (c.y() - a.y())) * (c.x() - a.x()),
                     b.y(),
-                    plus.math.Util.Lerp(c.z(), a.z(), t) //matters for z buffering not implemented yet, still think this is slightly wrong
+                    plus.math.Mathx.Lerp(c.z(), a.z(), t) //matters for z buffering not implemented yet, still think this is slightly wrong
             );
             Vector3 uvd = new Vector3( //im thinking this is wrong...especially since uvs can be any orientation
-                    plus.math.Util.Lerp(uvc.x(), uva.x(), t),
-                    plus.math.Util.Lerp(uvc.y(), uva.y(), t)
+                    plus.math.Mathx.Lerp(uvc.x(), uva.x(), t),
+                    plus.math.Mathx.Lerp(uvc.y(), uva.y(), t)
             );
             //Fill 2 new triangles, and sketch the edges, need new draw line 2d function for uv mapping
             DrawLine2D(a,b,uva,uvb,img);
@@ -423,8 +423,8 @@ public class Camera extends Transform{
             Vector3 left = Vector3.Lerp(uva, uvb, t);
             Vector3 right = Vector3.Lerp(uva, uvc, t);
             
-            double zL = plus.math.Util.Lerp(a.z(), b.z(), t);
-            double zR = plus.math.Util.Lerp(a.z(), c.z(), t);
+            double zL = plus.math.Mathx.Lerp(a.z(), b.z(), t);
+            double zR = plus.math.Mathx.Lerp(a.z(), c.z(), t);
             DrawLine2D(new Vector3(leftX,scan,zL),new Vector3(rightX,scan,zR),left,right,img);
             
             leftX += invslope1;
@@ -452,8 +452,8 @@ public class Camera extends Transform{
             Vector3 left = Vector3.Lerp(uvc, uva, t);
             Vector3 right = Vector3.Lerp(uvc, uvb, t);
 
-            double zL = plus.math.Util.Lerp(c.z(), a.z(), t);
-            double zR = plus.math.Util.Lerp(c.z(), b.z(), t);
+            double zL = plus.math.Mathx.Lerp(c.z(), a.z(), t);
+            double zR = plus.math.Mathx.Lerp(c.z(), b.z(), t);
             DrawLine2D(new Vector3(leftX,scan, zL),new Vector3(rightX,scan, zR),left,right,img);
             
             leftX -= invslope1;
@@ -510,6 +510,7 @@ public class Camera extends Transform{
             Vector3 uv = Vector3.Lerp(uva, uvb, i);
             double u = uv.x();
             double v = uv.y();
+            //TODO remove -1 and clamp between 0 and width - 1 otherwise we'll never get that last pixel
             Color color = map.GetColor((int)(u*(map.GetWidth()-1)), (int)(v*(map.GetHeight()-1)));
             this.SetPixel(pix, color);
         }

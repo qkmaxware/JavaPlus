@@ -12,7 +12,6 @@ import plus.graphics.Geometry;
 import plus.game.Game;
 import plus.game.GameObject;
 import plus.game.GameScene;
-import plus.game.UpdateListener;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
 

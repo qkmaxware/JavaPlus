@@ -17,7 +17,7 @@ public class QuadTree<T> extends Tree<T>{
     public static int SE = 3;
     
     public QuadTree(T value){
-        root = new TreeNode<T>(4, value);
+        super(new TreeNode<T>(4, value));
     }
     
 }

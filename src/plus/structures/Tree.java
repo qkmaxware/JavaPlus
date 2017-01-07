@@ -13,6 +13,14 @@ public class Tree<T> {
     
     protected TreeNode<T> root;
 
+    public Tree(T value){
+        root = new TreeNode<T>(value);
+    }
+    
+    public Tree(TreeNode<T> node){
+        root = node;
+    }
+    
     /**
      * Get the root of the tree
      * @return 

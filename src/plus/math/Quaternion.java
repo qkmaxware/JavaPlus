@@ -183,7 +183,7 @@ public class Quaternion {
         double absDot = d < 0.f ? -d : d;
 
         // Set the first and second scale for the interpolation
-        alpha = plus.math.Util.Clamp01(alpha);
+        alpha = plus.math.Mathx.Clamp01(alpha);
         double scale0 = 1f - alpha;
         double scale1 = alpha;
 
@@ -275,6 +275,44 @@ public class Quaternion {
         return new Vector3(pitch,yaw,roll);
     }
     
+    /**
+     * Treat this quaternion as a rotation matrix and post-multiply by a column vector
+     * @param vec
+     * @return 
+     */
+    public Vector3 mul(Vector3 vec){
+        double num = x * 2;
+        double num2 = y * 2;
+        double num3 = z * 2;
+        double num4 = x * num;
+        double num5 = y * num2;
+        double num6 = z * num3;
+        double num7 = x * num2;
+        double num8 = x * num3;
+        double num9 = y * num3;
+        double num10 = w * num;
+        double num11 = w * num2;
+        double num12 = w * num3;
+        
+        return new Vector3(
+            (1f - (num5 + num6)) * vec.x() + (num7 - num12) * vec.y() + (num8 + num11) * vec.z(),
+            (num7 + num12) * vec.x() + (1f - (num4 + num6)) * vec.y() + (num9 - num10) * vec.z(),
+            (num8 - num11) * vec.x() + (num9 + num10) * vec.y() + (1f - (num4 + num5)) * vec.z()    
+        );
+    }
+    
+    /**
+     * Convert the quaternion into the equivalent rotation matrix
+     * @return 
+     */
+    public Matrix ToMatrix3(){
+        Matrix r = new Matrix(new double[][]{
+            {1 - 2*y*y - 2*z*z,  2*x*y - 2*z*w,      2*x*z + 2*y*w},
+            {2*x*y + 2*z*w,      1 - 2*x*x - 2*z*z,  2*y*z - 2*x*w},
+            {2*x*z - 2*y*w,      2*y*z + 2*x*w,      1 - 2*x*x -2*y*y}
+        });
+        return r;
+    }
     
     @Override
     public boolean equals(Object b){

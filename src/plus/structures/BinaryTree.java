@@ -15,7 +15,7 @@ public class BinaryTree<T> extends Tree<T>{
     public static int right = 1;
     
     public BinaryTree(T value){
-        this.root = new TreeNode<T>(2,value);
+        super(new TreeNode<T>(2,value));
     }
     
 }
