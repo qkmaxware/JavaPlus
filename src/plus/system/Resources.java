@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
 import plus.math.Pair;
@@ -72,7 +73,10 @@ public class Resources {
      */
     public static void LoadObject(String fname){ 
        try {
-            for(Pair<String, Geometry> obj : ObjParser.Parse((String[])Files.readAllLines(Paths.get(fname)).toArray())){
+            List<String> lines = Files.readAllLines(Paths.get(fname));
+            String[] lines_array = new String[lines.size()];
+            lines.toArray(lines_array);
+            for(Pair<String, Geometry> obj : ObjParser.Parse(lines_array)){
                 geoms.put(obj.GetLeft(), obj.GetRight());
             } 
         } catch (Exception e) {

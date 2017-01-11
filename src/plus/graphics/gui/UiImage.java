@@ -5,9 +5,11 @@
  */
 package plus.graphics.gui;
 
+import java.util.LinkedList;
 import plus.graphics.Bitmap;
 import plus.graphics.Camera;
 import plus.math.Vector3;
+import plus.system.functional.Action2;
 
 /**
  *
@@ -17,8 +19,18 @@ public class UiImage extends Ui{
 
     public Bitmap image;
     
+    private LinkedList<Action2<UiImage, Double>> GuiEvents = new LinkedList<Action2<UiImage, Double>>();
+    
     public UiImage(Bitmap image){
         this.image = image;
+    }
+    
+    public void OnGui(Action2<UiImage, Double> event){
+        this.GuiEvents.add(event);
+    }
+    
+    public void RemoveOnGui(Action2<UiImage, Double> event){
+        GuiEvents.remove(event);
     }
     
     @Override

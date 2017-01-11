@@ -41,6 +41,19 @@ public class GameScene{
             this.physics = new Simulation();
         }
         
+        public GameScene(String title, GameObject[] objects, Ui[] overlays){
+            this(title);
+            if(objects != null)
+            for(GameObject g : objects){
+                this.Instanciate(g);
+            }
+            if(overlays != null)
+            for(Ui g : overlays){
+                this.AddUi(g);
+            }
+            this.ResolveQueue();
+        }
+        
         /*
         public void BackUp(){
             backup_objs.clear();

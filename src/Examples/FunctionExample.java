@@ -26,8 +26,8 @@ public class FunctionExample {
                 
         Func2<TreeNode<Integer>,Integer, Integer> insertFn = (node, val) -> {
                 if(val < node.GetValue())
-                    return 0;
-                else return 1;
+                    return BinaryTree.left;
+                else return BinaryTree.right;
         };
         
         //Use function to insert values into our trees at the desired position
@@ -42,8 +42,6 @@ public class FunctionExample {
         //Empty list of all objects who's value is < 5
         LinkedList<TreeNode<Integer>> lessThanFive = new LinkedList<>();
         
-        //Create functions which we will use to filter through our tree
-
         //Run through the tree and perform an actions on each node
         number.GetRoot().PreOrderCascade((node) -> {
             if(node != null)

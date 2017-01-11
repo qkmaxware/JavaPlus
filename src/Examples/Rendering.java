@@ -5,6 +5,7 @@
  */
 package Examples;
 
+import java.awt.Color;
 import plus.system.Resources;
 import plus.math.Vector3;
 import plus.graphics.Camera;
@@ -14,6 +15,8 @@ import plus.game.GameObject;
 import plus.game.GameScene;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
+import plus.graphics.gui.Ui;
+import plus.graphics.gui.UiText;
 
 /**
  *
@@ -22,17 +25,9 @@ import javax.swing.JFrame;
 public class Rendering {
     
     public static void main(String[] args){
-        //Load all system resources we are going to use
-        Resources.LoadImage("resources/textures/dry.jpg");
-        Resources.LoadImage("resources/textures/grass.png");
-        Resources.LoadImage("CrateSheet.png");
-        Resources.LoadObject("cube.obj");
-        
         Game game = new Game();                                     //Create the game object
         
-        GameScene scene = new GameScene("Render");                  //Create 3d scene     
-        
-        //Create GameObjects
+        //Create GameObjects. GameObjects recieve games events
         Geometry floor = new Geometry(Geometry.plane);
         floor.SetLocalScale(Vector3.one.scale(2));
         floor.SetLocalPosition(new Vector3(0,1,8));
@@ -41,8 +36,7 @@ public class Rendering {
         floor.SetBitmap(Resources.GetImage("grass"));
 
         GameObject floorObj = new GameObject("Floor", floor);
-        scene.Instanciate(floorObj);
-        
+
         Camera cam = new Camera(640,480);                           //Create a new camera who's render size is 640x480 pixels
         cam.SetRenderMode(Camera.RenderMode.Perspective);           //Use perspective rendering
        
@@ -51,13 +45,18 @@ public class Rendering {
         
         cam.SetLocalEulerAngles(new Vector3(0,0,0));                //Rotate the camera
         cam.SetLocalPosition(new Vector3(0,0,0));                   //Move the camera (note -y is up). I accidentaly inverted my axis
-        
-        scene.Instanciate(cameraObj);
-        
-        game.GetSceneManager().LoadScene(scene);                    //Set the active scene
-        scene.camera = cam;
 
-        cameraObj.OnUpdate((obj, deltatime) -> {
+        UiText text = new UiText("RENDERING DEMO", Color.yellow);   //Create some text to draw on the camera
+        text.origin = Ui.TopLeft;                                   //Anchor the text to the top left corner of the scene
+        
+        GameScene scene = new GameScene("Render",                   //Create 3d scene  
+                new GameObject[]{floorObj, cameraObj},
+                new Ui[]{text}
+        );  
+        scene.camera = cam;
+        game.GetSceneManager().LoadScene(scene);                    //Set the active scene
+        
+        cameraObj.OnUpdate((obj, deltatime) -> {                    //Add an event listener
                 //Camera movement -- fly camera behavior
                 Vector3 movement = Vector3.zero;
                 if(game.input.KeyDown(KeyEvent.VK_W)){
