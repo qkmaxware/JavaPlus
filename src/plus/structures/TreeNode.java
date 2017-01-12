@@ -19,9 +19,12 @@ public class TreeNode<T> {
     private int maxSize = -1;
     private boolean noLimit = false;
     
+    private TreeNode<T> parent;
+    
     protected TreeNode(T value){
         noLimit = true;
         this.children = new ArrayList<TreeNode<T>>();
+        this.value = value;
     }
     protected TreeNode(int children, T value){
         this.maxSize = children;
@@ -58,8 +61,10 @@ public class TreeNode<T> {
      * @param child 
      */
     public void SetChild(int i, TreeNode<T> child){
-        if(child.maxSize == this.maxSize || noLimit)
+        if(child.maxSize == this.maxSize || noLimit){
+            child.parent = this;
             children.set(i, child);
+        }
     }
     
     /**
@@ -69,6 +74,7 @@ public class TreeNode<T> {
     public void Add(T childData){
         TreeNode<T> child = new TreeNode<T>(this.children.size(), childData, !this.noLimit);
         this.SetChild(this.children.size(), value);
+        child.parent = this;
     }
     
     /**
@@ -79,6 +85,14 @@ public class TreeNode<T> {
     public void SetChild(int i, T value){
         TreeNode<T> child = new TreeNode<T>(this.children.size(), value, !this.noLimit);
         SetChild(i, child);
+    }
+    
+    /**
+     * Reference to the last assigned parent of this node
+     * @return 
+     */
+    public TreeNode<T> GetParent(){
+        return this.parent;
     }
     
     /**
@@ -114,7 +128,7 @@ public class TreeNode<T> {
     public void PostOrderCascade(Action1<TreeNode<T>> fn){
         for(TreeNode<T> child : this.children){
             if(child != null)
-                child.PreOrderCascade(fn);
+                child.PostOrderCascade(fn);
         }
         fn.Invoke(this);
     }

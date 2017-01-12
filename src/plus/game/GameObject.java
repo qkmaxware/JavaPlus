@@ -19,7 +19,7 @@ public class GameObject{
     public String name;
     public String tag;
     
-    private final Transform transform = new Transform();
+    public final Transform transform = new Transform();
     private RenderObject renderable;
     private plus.physics.Body body;
     
