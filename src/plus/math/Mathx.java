@@ -76,7 +76,7 @@ public class Mathx {
      * @param f
      * @return boolean
      */
-    public static boolean IsEven(float f){
+    public static boolean IsEven(double f){
         return (f%2)==0;
     }
     
@@ -101,12 +101,69 @@ public class Mathx {
     }
     
     /**
+     * Calculate the base 'x' log of a value
+     * @param value
+     * @param base
+     * @return 
+     */
+    public static double Logb(double value, double base){
+        return Math.log(value) / Math.log(base);
+    }
+    
+    /**
+     * Calculate the nth root of a value
+     * @param value
+     * @param n
+     * @return 
+     */
+    public static Complex NRoot(double value, double n){
+        //Perform (-1) ^ 1/n  * abs(x) ^ 1/n = (-x) ^ 1/n
+        boolean img = value < 0;
+        double v = Math.abs(value);
+        double result = Math.pow(v, 1.0 / n);
+        
+        Complex c = new Complex(result, 0);
+        
+        //root n of -1, and root n of result
+        //-1 ^ 1/n = cos(pi/n) + i * sin(pi/n)
+        if(img){
+            double real_root_n1 = Math.cos(Math.PI / n);
+            double img_root_n1 = Math.sin(Math.PI / n);
+            
+            Complex c2 = new Complex(real_root_n1, img_root_n1);
+            return c2.mul(c);
+        }else{
+            return c;
+        }  
+    }
+    
+    /**
+     * Kronecker delta function. 1 if parameters are equal, 0 otherwise
+     * @param x
+     * @param y
+     * @return 
+     */
+    public static double Delta(double x, double y){
+        return x == y ? 1 : 0;
+    }
+    
+    /**
+     * Absolute difference between two values
+     * @param x
+     * @param y
+     * @return 
+     */
+    public static double Difference(double x, double y){
+        return Math.abs(y - x);
+    }
+    
+    /**
      * Wrap a degree angels to between -180 and 180
      * @param degrees
      * @return 
      */
-    public static float WrapAngle(float degrees){
-        float newAngle = degrees;
+    public static double WrapAngle(double degrees){
+        double newAngle = degrees;
         while(newAngle > 180) //-180 -> 179 if newAngle if -181
             newAngle -= 360;
         while(newAngle < -180) //180 -> -179 if newAngle is 181
@@ -115,12 +172,29 @@ public class Mathx {
     }
     
     /**
+     * Wrap a value as if it loops from a minimum value to a maximum
+     * @param value
+     * @param max
+     * @param min
+     * @return 
+     */
+    public static double Wrap(double value, double max, double min){
+        while(value < min){
+            value -= min;
+        }
+        while(value > max){
+            value -= max;
+        }
+        return value;
+    }
+    
+    /**
      * Sum of a list of numbers
      * @param value
      * @return float
      */
-    public static float Sum(float ... value){
-        float sum = 0;
+    public static double Sum(double ... value){
+        double sum = 0;
         for(int i = 0; i < value.length; i++){
             sum += value[i];
         }
@@ -132,8 +206,8 @@ public class Mathx {
      * @param value
      * @return float
      */
-    public static float Product(float ... value){
-        float sum = 1;
+    public static double Product(double ... value){
+        double sum = 1;
         for(int i = 0; i < value.length; i++){
             sum *= value[i];
         }
@@ -158,14 +232,14 @@ public class Mathx {
      * @param val
      * @return 
      */
-    public static float atanf(float val){
+    public static double atanf(double val){
         if(val >= -1 && val <=1)
             //Different types of approximations
             //(float)(Math.PI*0.25f*val + 0.273f*val*(1- Math.abs(val)));
             //val/(1 + 0.28125f*val*val);
             return  val/(1 + 0.28125f*val*val);
         else
-            return (float)Math.atan(val);
+            return Math.atan(val);
     }
     
     /**

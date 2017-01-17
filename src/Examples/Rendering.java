@@ -17,7 +17,6 @@ import javax.swing.JFrame;
 import plus.graphics.gui.Ui;
 import plus.graphics.gui.UiText;
 import plus.math.Quaternion;
-import plus.system.Debug;
 
 /**
  *
@@ -35,19 +34,6 @@ public class Rendering {
         floor.SetLocalEulerAngles(new Vector3(0,0,45));
         floor.SetRenderMode(Geometry.RenderMode.Solid);
 
-        //Should be
-        // 0, 45, 0
-        // 0, 0.4, 0, 0.9
-        // 0, 45, 0
-        //https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles look here maybe
-        
-        Quaternion q = Quaternion.identity;
-        Quaternion m = Quaternion.Euler(new Vector3(0,45,0));
-        Debug.Log(new Vector3(0,45,0));
-        Debug.Log(m);
-        Debug.Log(m.Euler());
-        
-        
         GameObject floorObj = new GameObject("Floor", floor);
         floorObj.OnUpdate((go, deltatime) -> {
             //go.transform.SetLocalRotation(go.transform.GetLocalRotation().mul(Quaternion.Euler(new Vector3(0,12*deltatime,0))));
