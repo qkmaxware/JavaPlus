@@ -62,6 +62,7 @@ public class TreeNode<T> {
      */
     public void SetChild(int i, TreeNode<T> child){
         if(child.maxSize == this.maxSize || noLimit){
+            this.children.ensureCapacity(i+1);
             child.parent = this;
             children.set(i, child);
         }

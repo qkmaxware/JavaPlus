@@ -5,8 +5,7 @@
  */
 package Examples;
 
-import plus.math.Complex;
-import plus.math.Matrix;
+import plus.math.*;
 import plus.system.Debug;
 import plus.system.Perlin;
 import plus.system.Random;
@@ -19,9 +18,16 @@ public class MathExample {
     
     public static void main(String[] args){
         
-        Complex a = new Complex(12, 5);
-        Complex b = new Complex(2, -12);
+        Quaternion q = Quaternion.Euler(new Vector3(60,0,0));
+
+        Vector3 rot = q.mul(Vector3.forward);
+        Debug.Log(q);
+        Debug.Log(rot);
         
+        Complex a = Complex.Parse("12 + 5i");   //new Complex(12, 5);
+        Complex b = Complex.Parse("2 - 12i");   //new Complex(2, -12);
+        
+        Debug.Log(a);
         Debug.Log(a.add(b));
         
         Matrix m = new Matrix(new double[][]{

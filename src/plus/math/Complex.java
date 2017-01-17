@@ -1,9 +1,14 @@
 package plus.math;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import plus.system.Debug;
+
 public class Complex{
 
     private double real;
     private double img;
+    private static Pattern regex = Pattern.compile("(\\d*(?:\\.\\d*)?)?\\s*([+-]?\\s*\\d*(?:\\.\\d*)?[iIjJ])?");
     
     /**
      * Creates a complex number with real and imaginary parts
@@ -32,6 +37,55 @@ public class Complex{
         this.img = 0;
     }
 
+    /**
+     * Parse a string into a complex value
+     * @param value
+     * @return 
+     */
+    public static Complex Parse(String value){
+        Complex c = new Complex();
+        
+        Matcher matches = regex.matcher(value);
+        while(matches.find()){
+            //Starting at group 1 (0 is full match)
+            for(int i = 1; i <= matches.groupCount(); i++){
+                if(matches.group(i) == null)
+                    continue;
+                
+                String match = matches.group(i).toLowerCase();
+                if(match.isEmpty()){
+                    continue;
+                }
+                
+                boolean negative = false;
+                if(match.startsWith("-")){
+                    negative = true;
+                    match = match.substring(1).trim();
+                }
+                else if (match.startsWith("+")){
+                    negative = false;
+                    match = match.substring(1).trim();
+                }
+
+                boolean img = false;
+                if(match.matches(".*[ij]$")){
+                    img = true;
+                    match = match.substring(0, match.length() - 1).trim();
+                }
+
+                double dvalue = Double.parseDouble(match);
+                if(img){
+                    c.img = (negative ? -1: 1) * dvalue; 
+                }else{
+                    c.real = (negative ? -1: 1) * dvalue; 
+                }
+            }
+        }
+        
+        return c;
+    }
+    
+    
     /**
      * The complex conjugate of this number
      * @return 

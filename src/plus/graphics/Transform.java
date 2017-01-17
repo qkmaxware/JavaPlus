@@ -89,7 +89,7 @@ public class Transform {
      * @param angle 
      */
     public void SetLocalEulerAngles(Vector3 angle){
-        this.SetLocalRotation(Quaternion.FromEulerAngle(angle));
+        this.SetLocalRotation(Quaternion.Euler(angle));
     }
     
     /**
@@ -127,7 +127,7 @@ public class Transform {
      * @param angle 
      */
     public void SetEulerAngles(Vector3 angle){
-        SetRotation(Quaternion.FromEulerAngle(angle));
+        SetRotation(Quaternion.Euler(angle));
     }
     
     /**
@@ -135,7 +135,7 @@ public class Transform {
      * @return 
      */
     public Vector3 GetLocalEulerAngles(){
-        return this.rotation.ToEulerAngle();
+        return this.rotation.Euler();
     }
     
     /**
@@ -188,7 +188,7 @@ public class Transform {
      * @return 
      */
     public Vector3 GetEulerAngles(){
-        return GetRotation().ToEulerAngle();
+        return GetRotation().Euler();
     }
     
     /**
@@ -272,15 +272,41 @@ public class Transform {
     }
     
     /**
+     * Create a 4x4 transformation matrix with the given values for position, rotation, and scale
+     * @param translation
+     * @param rotation
+     * @param scale
+     * @return 
+     */
+    public static Matrix TRS(Vector3 translation, Quaternion rotation, Vector3 scale){
+        double x = translation.x(); double y = translation.y(); double z = translation.z();
+        double l = scale.x(); double j = scale.y(); double k = scale.z();
+        double a = rotation.x(); double b = rotation.y(); double c = rotation.z(); double d = rotation.w();
+        
+        
+        Matrix m = new Matrix(new double[][]{
+            {l*(1-2*c*c - 2*b*b), l*(2*a*b - 2*c*d), l*(2*a*c + 2*b*d), x},
+            {j*(2*a*b + 2*c*d), j*(1-2*c*c - 2*a*a), j*(2*b*c - 2*a*d), y},
+            {k*(2*a*c - 2*b*d), k*(2*a*d + 2*b*c), k*(1-2*b*b -2*a*a), z},
+            {0,0,0,1}
+        });
+        
+        return m;
+    }
+    
+    /**
      * Recompute the transformation matrices
      */
     public void RecomputeMatrices(){
         //localToWorld --> trans * scale * rotY * rotX * rotZ
+        this.localToWorldMatrix = Transform.TRS(position, rotation, scale);
+        /*
         double x = position.x(); double y = position.y(); double z = position.z();
         double l = scale.x(); double j = scale.y(); double k = scale.z();
         //TODO use quaterionons only, don't convert to EulerAngles
         Vector3 rotation = this.rotation.ToEulerAngle();
         double a = plus.math.Mathx.DegreesToRadians(rotation.x()); double b = plus.math.Mathx.DegreesToRadians(rotation.y()); double g = plus.math.Mathx.DegreesToRadians(rotation.z());
+        
         this.localToWorldMatrix = new Matrix(
                 new double[][]
                 {
@@ -289,7 +315,7 @@ public class Transform {
                     {k*sin(a)*sin(g)*cos(b)-k*sin(b)*cos(g), k*sin(a)*cos(b)*cos(g)+k*sin(b)*sin(g), k*cos(a)*cos(b), z},
                     {0,0,0,1}
                 }
-        );
+        );*/
 		
         //world to local as inverse of localToWorld --> affine inverse of localToWorld
         /*
@@ -303,9 +329,9 @@ public class Transform {
         */
         Matrix A = this.localToWorldMatrix;
         //3x3 submatrix values 'M'
-        a = A.Get(0, 0); b = A.Get(0, 1); double c = A.Get(0, 2);
+        double a = A.Get(0, 0); double b = A.Get(0, 1); double c = A.Get(0, 2);
         double d = A.Get(1, 0);double e = A.Get(1, 1);double f = A.Get(1, 2);
-        g = A.Get(2, 0);double h = A.Get(2, 1);double i = A.Get(2, 2);
+        double g = A.Get(2, 0);double h = A.Get(2, 1);double i = A.Get(2, 2);
         double bx = A.Get(0,3); double by = A.Get(1,3); double bz = A.Get(2, 3);
         double det = -a*f*h + e*a*i - b*d*i + b*f*g + c*d*h - e*c*g;
         //Inverse of 'M'
@@ -408,7 +434,7 @@ public class Transform {
     }
     
     /**
-     * Transform a point in local coordinates into world coodinates
+     * Transform a point in local coordinates into world coordinates
      * @param a
      * @return 
      */
@@ -419,7 +445,17 @@ public class Transform {
     }
     
     /**
-     * Transform a point in world coordinates into local coodinates
+     * Transforms a direction from local coordinates to world coordinates
+     * @param a
+     * @return 
+     */
+    public Vector3 TransformDirection(Vector3 a){
+        Vector3 d = this.GetRotation().mul(a);
+        return d;
+    }
+    
+    /**
+     * Transform a point in world coordinates into local coordinates
      * @param a
      * @return 
      */
@@ -427,6 +463,15 @@ public class Transform {
         Matrix m = this.WorldToLocalMatrix();
         Matrix r = m.mul(a.GetMatrix());
         return new Vector3(r.Get(0, 3), r.Get(1, 3), r.Get(2, 3));
+    }
+    
+    /**
+     * Transform a direction from world coordinates to local coordinates 
+     * @param a
+     * @return 
+     */
+    public Vector3 InverseTransformDirection(Vector3 a){
+        return this.GetRotation().Conjugate().mul(a);
     }
     
     /**

@@ -6,7 +6,7 @@
 package plus.math;
 
 /**
- * 
+ * https://gist.github.com/aeroson/043001ca12fe29ee911e
  * @author Colin Halseth
  */
 public class Quaternion {
@@ -19,14 +19,14 @@ public class Quaternion {
     private double w;
     
     /**
-     * Quaternion with all 0 values.
+     * Quaternion identical to the identity quaternion
      */
     public Quaternion(){
-        x = 0; y = 0; z = 0; w = 0;
+        x = 0; y = 0; z = 0; w = 1;
     }
     
     /**
-     * Quaternion with desired x,y,z,w components
+     * Create a quaternion with the desired x,y,z,w components
      * @param x
      * @param y
      * @param z
@@ -34,6 +34,18 @@ public class Quaternion {
      */
     public Quaternion(double x, double y, double z, double w){
         this.x = x; this.y = y; this.z = z; this.w = w;
+    }
+    
+    /**
+     * Create a quaternion with the desired x,y,z,w components
+     * @param xyz
+     * @param w 
+     */
+    public Quaternion(Vector3 xyz, double w){
+        this.x = xyz.x();
+        this.y = xyz.y();
+        this.z = xyz.z();
+        this.w = w;
     }
     
     /**
@@ -92,7 +104,7 @@ public class Quaternion {
      * @return 
      */
     public double Magnitude(){
-        return (double)Math.sqrt(x*x + y*y + z*z + w*w);
+        return Math.sqrt(x*x + y*y + z*z + w*w);
     }
     
     /**
@@ -145,10 +157,10 @@ public class Quaternion {
      * @return 
      */
     public Quaternion mul(Quaternion q){
-        double newX = this.w * x + this.x * w + this.y * z - this.z * y;
-        double newY = this.w * y + this.y * w + this.z * x - this.x * z;
-        double newZ = this.w * z + this.z * w + this.x * y - this.y * x;
-        double newW = this.w * w - this.x * x - this.y * y - this.z * z;
+        double newX =  this.x * q.w + this.y * q.z - this.z * q.y + this.w * q.x;
+        double newY = -this.x * q.z + this.y * q.w + this.z * q.x + this.w * q.y;    
+        double newZ =  this.x * q.y - this.y * q.x + this.z * q.w + this.w * q.z;
+        double newW = -this.x * q.x - this.y * q.y - this.z * q.z + this.w * q.w;
 
         return new Quaternion(newX,newY,newZ,newW);
     }
@@ -169,6 +181,16 @@ public class Quaternion {
      */
     public double Dot(Quaternion q){
         return x*q.x + y*q.y + z*q.z + w*q.w;
+    }
+    
+    /**
+     * Dor product between two quaternions
+     * @param a
+     * @param b 
+     * @return  
+     */
+    public static double Dot(Quaternion a, Quaternion b){
+        return a.Dot(b);
     }
     
     /**
@@ -214,14 +236,17 @@ public class Quaternion {
     
     /**
      * Create a quaternion from a euler angle (yaw,pitch,roll)
-     * http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
      * @param axis
      * @return 
      */
-    public static Quaternion FromEulerAngle(Vector3 axis){
+    public static Quaternion Euler(Vector3 axis){
+        
+        //NOTE* swapped x,z attitude, bank because it gave me correct rotations this way. 
+        //Not sure why since x axis def is not bank axis - also changed on fromEuler function
+        //No problems observed with doing this right now.
         double heading = Math.toRadians(axis.y());
-        double attitude = Math.toRadians(axis.x());
-        double bank = Math.toRadians(axis.z());
+        double attitude = Math.toRadians(axis.z());
+        double bank = Math.toRadians(axis.x());
         
         double c1 = Math.cos(heading/2);
         double c2 = Math.cos(attitude/2);
@@ -230,49 +255,85 @@ public class Quaternion {
         double s2 = Math.sin(attitude/2);
         double s3 = Math.sin(bank/2);
         
+        double w = c1 * c2 * c3 - s1 * s2 * s3;
         double x = s1 * s2 * c3 + c1 * c2 * s3;
         double y = s1 * c2 * c3 + c1 * s2 * s3;
         double z = c1 * s2 * c3 - s1 * c2 * s3;
-        double w = c1 * c2 * c3 - s1 * s2 * s3;
         
         return new Quaternion(
                 x,y,z,w
         );
+        
     }
     
     /**
      * Create a euler angle (yaw,pitch,roll) representation from a quaternion
-     * http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
      * @return 
      */
-    public Vector3 ToEulerAngle(){
-        Quaternion q1 = this;
-        double test = q1.x*q1.y + q1.z*q1.w;
-        double heading = 0, attitude = 0, bank = 0;
+    public Vector3 Euler(){
+       
+        double sqw = this.w * this.w;
+        double sqx = this.x * this.x;
+        double sqy = this.y * this.y;
+        double sqz = this.z * this.z;
         
-	if (test > 0.499) { // singularity at north pole
-		heading = 2 * Math.atan2(q1.x,q1.w);
-		attitude = Math.PI/2;
-		bank = 0;
-	}
-        else if (test < -0.499) { // singularity at south pole
-		heading = -2 * Math.atan2(q1.x,q1.w);
-		attitude = - Math.PI/2;
-		bank = 0;
-	}else{
-            double sqx = q1.x*q1.x;
-            double sqy = q1.y*q1.y;
-            double sqz = q1.z*q1.z;
-            heading = Math.atan2(2*q1.y*q1.w-2*q1.x*q1.z , 1 - 2*sqy - 2*sqz);
-            attitude = Math.asin(2*test);
-            bank = Math.atan2(2*q1.x*q1.w-2*q1.y*q1.z , 1 - 2*sqx - 2*sqz);
+        double unit = sqx + sqy + sqz + sqw;
+        double test = this.x*this.y + this.z * this.w;
+        
+        double heading;
+        double attitude;
+        double bank;
+        
+        if(test > 0.499 * unit){
+            //North poll singularity
+            heading = 2 * Math.atan2(this.x, this.w);
+            attitude = Math.PI * (0.5);
+            bank = 0;
         }
+        else if(test < -0.499 * unit){
+            //South poll singularity
+            heading = -2 * Math.atan2(this.x, this.w);
+            attitude = - Math.PI * 0.5;
+            bank = 0;
+        }else{
+            heading = Math.atan2(2 * y * w - 2 * x * z, sqx - sqy - sqz + sqw);
+            attitude = Math.asin(2 * test / unit);
+            bank = Math.atan2(2 * x * w - 2 * y * z, -sqx + sqy - sqz + sqw);
+        }
+       
+        return new Vector3(Math.toDegrees(bank), Math.toDegrees(heading), Math.toDegrees(attitude));
+    }
+    
+    /**
+     * Create a quaternion from an Angle-Axis representation
+     * @param angle
+     * @param axis
+     * @return 
+     */
+    public static Quaternion AngleAxis(float angle, Vector3 axis){
+        if(axis.SquareMagnitude() == 0)
+            return Quaternion.identity;
         
-        double yaw = Math.toDegrees(heading);
-        double roll = Math.toDegrees(bank);
-        double pitch = Math.toDegrees(attitude);
-        
-        return new Vector3(pitch,yaw,roll);
+        double rad = Math.toRadians(angle) * 0.5;
+        Vector3 normal = axis.Normalize();
+        normal = normal.scale(Math.sin(rad));
+        return new Quaternion(
+                normal.x(),
+                normal.y(),
+                normal.z(),
+                Math.cos(rad)
+        ).Normalize();
+    }
+    
+    /**
+     * Angle between two quaternions
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static double Angle(Quaternion a, Quaternion b){
+        double d = a.Dot(b);
+        return Math.toDegrees(Math.acos(Math.min(Math.abs(d), 1)) * 2);
     }
     
     /**
@@ -324,6 +385,6 @@ public class Quaternion {
     }
     
     public String toString(){
-        return "("+x+","+y+","+z+","+w+")";
+        return "("+w+","+x+","+y+","+z+")";
     }
 }

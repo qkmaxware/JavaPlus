@@ -6,7 +6,6 @@
 package Examples;
 
 import java.awt.Color;
-import plus.system.Resources;
 import plus.math.Vector3;
 import plus.graphics.Camera;
 import plus.graphics.Geometry;
@@ -17,6 +16,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
 import plus.graphics.gui.Ui;
 import plus.graphics.gui.UiText;
+import plus.math.Quaternion;
+import plus.system.Debug;
 
 /**
  *
@@ -31,12 +32,27 @@ public class Rendering {
         Geometry floor = new Geometry(Geometry.plane);
         floor.SetLocalScale(Vector3.one.scale(2));
         floor.SetLocalPosition(new Vector3(0,1,8));
-        floor.SetLocalEulerAngles(new Vector3(90,0,0));
+        floor.SetLocalEulerAngles(new Vector3(0,0,45));
         floor.SetRenderMode(Geometry.RenderMode.Solid);
-        floor.SetBitmap(Resources.GetImage("grass"));
 
+        //Should be
+        // 0, 45, 0
+        // 0, 0.4, 0, 0.9
+        // 0, 45, 0
+        //https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles look here maybe
+        
+        Quaternion q = Quaternion.identity;
+        Quaternion m = Quaternion.Euler(new Vector3(0,45,0));
+        Debug.Log(new Vector3(0,45,0));
+        Debug.Log(m);
+        Debug.Log(m.Euler());
+        
+        
         GameObject floorObj = new GameObject("Floor", floor);
-
+        floorObj.OnUpdate((go, deltatime) -> {
+            //go.transform.SetLocalRotation(go.transform.GetLocalRotation().mul(Quaternion.Euler(new Vector3(0,12*deltatime,0))));
+        });
+        
         Camera cam = new Camera(640,480);                           //Create a new camera who's render size is 640x480 pixels
         cam.SetRenderMode(Camera.RenderMode.Perspective);           //Use perspective rendering
        
@@ -81,13 +97,14 @@ public class Rendering {
                     Vector3 mouse = game.input.MouseLocationOnPanel();
                     if(mouse != null){
 
-                    Vector3 halfwidth = new Vector3(game.GetViewport().getWidth(),game.GetViewport().getHeight()).scale(0.5f);
-                    Vector3 dif = mouse.sub(halfwidth);
-                    if(dif.SquareMagnitude() > 10){
-                        Vector3 rot = obj.GetTransform().GetLocalEulerAngles().add((new Vector3(-dif.y(),dif.x(),0)).scale(12*deltatime));
-                        obj.GetTransform().SetLocalEulerAngles(rot);
-                    }
-                    game.CenterMouse();
+                        Vector3 halfwidth = new Vector3(game.GetViewport().getWidth(),game.GetViewport().getHeight()).scale(0.5f);
+                        Vector3 dif = mouse.sub(halfwidth);
+                        if(dif.SquareMagnitude() > 10){
+                            Vector3 nrot = (new Vector3(-dif.y(),dif.x(),0)).scale(12*deltatime);
+                            Vector3 rotation = obj.transform.GetLocalEulerAngles().add(nrot);
+                            obj.transform.SetLocalRotation(Quaternion.Euler(rotation));
+                        }
+                        game.CenterMouse();
                     }
                 }
                 

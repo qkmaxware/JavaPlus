@@ -11,13 +11,16 @@ package plus.math;
  */
 public class Mathx {
     
+    public static final double Deg2Rad = Math.PI / 180;
+    public static final double Rad2Deg = 180 / Math.PI;
+    
     /**
      * Convert degrees to radians
      * @param deg
      * @return float
      */
     public static double DegreesToRadians(double deg){
-        return Math.toRadians(deg);
+        return deg * Deg2Rad;
     }
     
     /**
@@ -26,7 +29,7 @@ public class Mathx {
      * @return float
      */
     public static double RadiansToDegrees(double rad){
-        return Math.toDegrees(rad);
+        return rad * Rad2Deg;
     }
     
     /**

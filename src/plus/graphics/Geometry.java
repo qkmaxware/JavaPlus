@@ -5,8 +5,10 @@
  */
 package plus.graphics;
 
+import java.util.LinkedList;
 import plus.math.Matrix;
 import plus.math.Vector3;
+import plus.system.Debug;
 
 /**
  *
@@ -64,8 +66,20 @@ public class Geometry extends RenderObject{
                                                         new Vector3(0,0,0), new Vector3(1,0,0), new Vector3(0,1,0),
                                                         new Vector3(0,0,0), new Vector3(1,0,0), new Vector3(0,1,0),
                                                         new Vector3(0,0,0), new Vector3(1,0,0), new Vector3(0,1,0),
+                                                    },
+                                                    new Vector3[]
+                                                    {
+                                                        new Vector3(-1,-1,1),
+                                                        new Vector3(-1,1,1),
+                                                        new Vector3(-1,-1,-1),
+                                                        new Vector3(-1,1,-1),
+                                                        new Vector3(1,-1,1),
+                                                        new Vector3(1,1,1),
+                                                        new Vector3(1,-1,-1),
+                                                        new Vector3(1,1,-1),
                                                     }
-                                                    );
+    );
+    
     public static final Geometry point = new Geometry(new Vector3[]{Vector3.zero});
     
     public static final Geometry plane = new Geometry(
@@ -82,6 +96,10 @@ public class Geometry extends RenderObject{
                                                     new Vector3[]{
                                                         new Vector3(0,1,0), new Vector3(1,1,0), new Vector3(0,0,0),
                                                         new Vector3(1,1,0), new Vector3(0,0,0), new Vector3(1,0,0)
+                                                    },
+                                                    new Vector3[]{
+                                                        new Vector3(0,0,-1), new Vector3(0,0,-1), 
+                                                        new Vector3(0,0,-1),new Vector3(0,0,-1)
                                                     }
     );
     
@@ -89,7 +107,10 @@ public class Geometry extends RenderObject{
     protected Vector3[] vertices;
     protected int[] tris;
     protected Vector3[] uvs;
-
+    protected Vector3[] normals;
+    
+    public boolean useCulling = true;
+    
     //Textrue data
     protected Bitmap texture;
     
@@ -97,6 +118,7 @@ public class Geometry extends RenderObject{
         this.vertices = new Vector3[0];
         this.tris = new int[0];
         this.uvs = new Vector3[0];
+        this.normals = new Vector3[0];
         
         AABB newBounds = new AABB(this);
         this.SetBounds(newBounds);
@@ -106,6 +128,7 @@ public class Geometry extends RenderObject{
         this.vertices = verts;
         this.tris = new int[0];
         this.uvs = new Vector3[0];
+        this.normals = new Vector3[0];
         
         AABB newBounds = new AABB(this);
         this.SetBounds(newBounds);
@@ -115,6 +138,7 @@ public class Geometry extends RenderObject{
         this.vertices = verts;
         this.tris = edges;
         this.uvs = new Vector3[0];
+        this.normals = new Vector3[0];
         
         AABB newBounds = new AABB(this);
         this.SetBounds(newBounds);
@@ -124,19 +148,34 @@ public class Geometry extends RenderObject{
         this.vertices = verts;
         this.tris = edges;
         this.uvs = uvs;
+        this.normals = new Vector3[0];
         
         AABB newBounds = new AABB(this);
         this.SetBounds(newBounds);
         newBounds.Rebuild(this);
     }
+    
+    public Geometry(Vector3[] verts, int[] edges, Vector3[] uvs, Vector3[] normals){
+        this.vertices = verts;
+        this.tris = edges;
+        this.uvs = uvs;
+        this.normals = normals;
+        
+        AABB newBounds = new AABB(this);
+        this.SetBounds(newBounds);
+        newBounds.Rebuild(this);
+    }
+    
     public Geometry(Geometry geom){
         this.vertices = new Vector3[geom.vertices.length];
         this.tris = new int[geom.tris.length];
         this.uvs = new Vector3[geom.uvs.length];
+        this.normals = new Vector3[geom.normals.length];
         
         System.arraycopy(geom.vertices, 0, this.vertices, 0, geom.vertices.length);
         System.arraycopy(geom.tris, 0, this.tris, 0, geom.tris.length);
         System.arraycopy(geom.uvs, 0, this.uvs, 0, geom.uvs.length);
+        System.arraycopy(geom.normals, 0, this.normals, 0, geom.normals.length);
         
         this.SetPosition(geom.GetPosition());
         this.SetRotation(geom.GetRotation());
@@ -215,16 +254,64 @@ public class Geometry extends RenderObject{
     }
 
     /**
+     * Recalculate the normals for this geometry from the defined triangles. Slow, so use sparingly. 
+     */
+    public void RecalculateNormals(){
+        LinkedList<Vector3> normals = new LinkedList<Vector3>();
+        for (int i = 0; i < this.vertices.length; i++) {
+            normals.add(Vector3.zero);
+        }
+        for (int i = 0; i < this.tris.length; i += 3) {
+            Vector3 p1 = vertices[this.tris[i + 0]];
+            Vector3 p2 = vertices[this.tris[i + 1]];
+            Vector3 p3 = vertices[this.tris[i + 2]];
+
+            Vector3 v1 = p2.sub(p1);
+            Vector3 v2 = p3.sub(p1);
+            Vector3 normal = Vector3.Cross(v1,v2);
+
+            normals.set(this.tris[i + 0], normals.get(this.tris[i + 0]).add(normal));
+            normals.set(this.tris[i + 1], normals.get(this.tris[i + 1]).add(normal));
+            normals.set(this.tris[i + 2], normals.get(this.tris[i + 2]).add(normal));
+        }
+        for (int i = 0; i < normals.size(); i++){
+            normals.set(i, normals.get(i).Normalize());
+        }
+        this.normals = normals.toArray(this.normals);
+    }
+    
+    /**
+     * Flip the direction of all normals
+     */
+    public void FlipNormals() {
+	for (int i = 0; i < normals.length; i++) {
+            normals[i] = normals[i].scale(-1);
+        }
+    }
+    
+    /**
      * Render this object to a camera
      * @param cam 
      */
     @Override
     public void Render(Camera cam) {
+        Vector3 bkw = cam.Forward().Normalize().scale(-1);
         for(int i = 0; i < this.tris.length; i+=3){
             //Get the vertex indexes for this edge
             int edge1 = this.tris[i];
             int edge2 = this.tris[i+1];
             int edge3 = this.tris[i+2];
+            
+            //Perform backface-culling
+            //Usually done by direction from camera to triangle, using camera's forward instead for now for speed
+            if(this.useCulling)
+                if(this.normals.length >= edge1 && this.normals.length >= edge2 && this.normals.length >= edge3){
+                    Vector3 faceNormal = this.normals[edge1].add(this.normals[edge2].add(this.normals[edge3]));
+                    Vector3 worldNormal = this.TransformDirection(faceNormal).Normalize();
+                    if(Vector3.Dot(bkw, worldNormal) < -0.1){ //0.1 buffer
+                        continue;
+                    }
+                }
             
             //Project vetices. If not inside view frustrum skip drawing.
             Vector3[] args = cam.ProjectTriangle(this.GetMatrix(), this.vertices[edge1], this.vertices[edge2], this.vertices[edge3]);
