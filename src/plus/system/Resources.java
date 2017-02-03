@@ -10,13 +10,13 @@ import plus.math.Vector3;
 import plus.graphics.Bitmap;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 import javax.imageio.ImageIO;
 import plus.math.Pair;
 
@@ -31,16 +31,58 @@ public class Resources {
     
     /**
      * Load an image from file 
-     * @param fname 
+     * @param file 
      */
-    public static void LoadImage(String fname){
+    public static void LoadImage(String file){
+        LoadImage(file.replaceAll(".*\\/|\\..*$","").trim(), file);
+    }
+    
+    /**
+     * Load an image from file saved with a specific name
+     * @param name
+     * @param file 
+     */
+    public static void LoadImage(String name, String file){
         try {
-            File f = new File(fname);
+            File f = new File(file);
             BufferedImage img = ImageIO.read(f);
-            String filename = fname.replaceAll(".*\\/|\\..*$","").trim();
+            String filename = name;
             bitmaps.put(filename, new Bitmap(img)); //Bitmaps will replace buffered images for speed purposes
         } catch (Exception e) {
-            System.out.println("Resource: [\"" + fname + "\"] doesn't exist");
+            System.out.println("Resource: [\"" + file + "\"] doesn't exist");
+        }
+    }
+    
+    /**
+     * Load an image from url
+     * @param url 
+     */
+    public static void LoadImage(URL url){
+        LoadImage(url.getPath().replaceAll(".*\\/|\\..*$","").trim(), url);
+    }
+    
+    /**
+     * Load an image from a url saved a specific name
+     * @param url 
+     * @param name
+     */
+    public static void LoadImage(String name, URL url){
+        try {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+            connection.setRequestProperty("Accept", "application/json");
+            
+            connection.connect();
+            
+            InputStream is = connection.getInputStream();
+
+            BufferedImage img = ImageIO.read(is);
+            String filename = name;
+            bitmaps.put(filename, new Bitmap(img)); //Bitmaps will replace buffered images for speed purposes
+        } catch (Exception e) {
+            System.out.println("Resource: [\"" + url.toString() + "\"] can not be accessed");
         }
     }
     

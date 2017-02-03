@@ -60,10 +60,13 @@ public class Simulation {
             if(body.UseGravity)
                 body.AddForce(Vector3.up.scale(-9.8f*deltatime));
             
-            
-            
             //Check for collisions
-            
+             for(int j = 0; j < rigidbodies.size(); j++){
+                 if(j == i)
+                     return;
+                 //If collision, set to resolve
+                 
+             }
             //Update the body's position and rotation
             body.Update(deltatime);
         }

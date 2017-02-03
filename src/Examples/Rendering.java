@@ -13,10 +13,12 @@ import plus.game.Game;
 import plus.game.GameObject;
 import plus.game.GameScene;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
 import javax.swing.JFrame;
 import plus.graphics.gui.Ui;
 import plus.graphics.gui.UiText;
 import plus.math.Quaternion;
+import plus.system.Debug;
 
 /**
  *
@@ -96,7 +98,7 @@ public class Rendering {
                 
                 //Framerate independance for movement -- speed 12
                 Vector3 delta = movement.scale(12*deltatime);
-                obj.GetTransform().SetLocalPosition(obj.GetTransform().GetLocalPosition().add(delta));
+                obj.transform.SetLocalPosition(obj.transform.GetLocalPosition().add(delta));
         });
         
         //Basic SWING components to house the engine

@@ -223,7 +223,7 @@ public class Transform {
      */
     public Vector3 Up(){
         Matrix m = this.LocalToWorldMatrix();
-        return (new Vector3(m.Get(0, 1), m.Get(1,1), m.Get(2, 1))).scale(-1); //down vector inverted
+        return (new Vector3(-m.Get(0, 1), -m.Get(1,1),- m.Get(2, 1))); //down vector inverted
     }
     
     /**
@@ -349,14 +349,13 @@ public class Transform {
         double nInvMbx = -(invMa*bx + invMb*by + invMc*bz);
         double nInvMby = -(invMd*bx + invMe*by + invMf*bz);
         double nInvMbz = -(invMg*bx + invMh*by + invMi*bz);
-        Matrix in = new Matrix(4,4,
-                new double[]{
-                    invMa, invMd, invMg, 0,
-                    invMb, invMe, invMh, 0,
-                    invMc, invMf, invMi, 0,
-                    nInvMbx    , nInvMby    , nInvMbz    , 1
-                }
-        );
+        Matrix in = new Matrix(new double[][]{
+            {invMa, invMb,  invMc,  nInvMbx},
+            {invMd, invMe,  invMf,  nInvMby},
+            {invMg, invMh,  invMi,  nInvMbz},
+            {0,     0,      0,      1}
+        });
+        
         this.worldToLocalMatrix = in;
         
         this.updateMatrix = false;

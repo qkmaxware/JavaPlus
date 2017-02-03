@@ -9,6 +9,7 @@ import plus.math.*;
 import plus.system.Debug;
 import plus.system.Perlin;
 import plus.system.Random;
+import plus.system.functional.Func1;
 
 /**
  *
@@ -33,13 +34,18 @@ public class MathExample {
         Debug.Log(a);
         Debug.Log(a.add(b));
         
-        Matrix m = new Matrix(new double[][]{
-            {1, 2, 3, 4},
-            {5, 6, 7, 8},
-            {9, 10, 11, 12},
-            {13, 14, 15, 16}
-        });
-        Debug.Log(m);
+        Func1<Double,Double> floor = (in) -> {
+            return Math.floor(in);
+        };
+        
+        for(int i = 0; i < 6; i++){
+            Matrix ma = Matrix.Random(3, 3).scale(4).operate(floor);
+            Matrix mb = Matrix.Random(3, 3).scale(4).operate(floor);
+            
+            Debug.Log(ma);
+            Debug.Log(mb);
+            Debug.Log(ma.mul(mb).toPrettyString());
+        }
         
         Debug.Log(plus.math.Mathx.Factorial(5));
         

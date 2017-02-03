@@ -10,6 +10,7 @@ import plus.graphics.RenderObject;
 import plus.graphics.Scene;
 import plus.physics.Simulation;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import plus.graphics.gui.Ui;
 import plus.system.functional.Action2;
 
@@ -29,8 +30,8 @@ public class GameScene{
         private LinkedList<GameObject> created = new LinkedList<GameObject>();
         private LinkedList<GameObject> destroyed = new LinkedList<GameObject>();
         
-        private LinkedList<Ui> overlay_adds = new LinkedList<Ui>();
-        private LinkedList<Ui> overlay_destroys = new LinkedList<Ui>();
+        private ConcurrentLinkedQueue<Ui> overlay_adds = new ConcurrentLinkedQueue<Ui>();
+        private ConcurrentLinkedQueue<Ui> overlay_destroys = new ConcurrentLinkedQueue<Ui>();
         
         //private LinkedList<GameObject> backup_objs = new LinkedList<GameObject>();
         //private LinkedList<Transform> backup_transforms = new LinkedList<Transform>();
@@ -41,6 +42,24 @@ public class GameScene{
             this.physics = new Simulation();
         }
         
+        public GameScene(String title, GameObject[] objects){
+            this(title);
+            if(objects != null)
+            for(GameObject g : objects){
+                this.Instanciate(g);
+            }
+            this.ResolveQueue();
+        }
+        
+        public GameScene(String title, Ui[] overlays){
+            this(title);
+            if(overlays != null)
+            for(Ui g : overlays){
+                this.Instanciate(g);
+            }
+            this.ResolveQueue();
+        }
+        
         public GameScene(String title, GameObject[] objects, Ui[] overlays){
             this(title);
             if(objects != null)
@@ -49,7 +68,7 @@ public class GameScene{
             }
             if(overlays != null)
             for(Ui g : overlays){
-                this.AddUi(g);
+                this.Instanciate(g);
             }
             this.ResolveQueue();
         }
@@ -85,7 +104,7 @@ public class GameScene{
          * Add a UI overlay element
          * @param ui 
          */
-        public void AddUi(Ui ui){
+        public void Instanciate(Ui ui){
             overlay_adds.add(ui);
         }
         
@@ -93,7 +112,7 @@ public class GameScene{
          * Remove a UI overlay element
          * @param ui 
          */
-        public void RemoveUi(Ui ui){
+        public void Destroy(Ui ui){
             this.overlay_destroys.add(ui);
         }
         
