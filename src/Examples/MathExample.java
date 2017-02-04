@@ -46,7 +46,7 @@ public class MathExample {
             Debug.Log(mb);
             Debug.Log(ma.mul(mb).toPrettyString());
         }
-        
+         
         Debug.Log(plus.math.Mathx.Factorial(5));
         
         Debug.Log(Random.Range(0.0f, 120f));

@@ -28,12 +28,6 @@ public class Console extends JTextArea{
   
     private LinkedList<Action1<String>> onSubmit = new LinkedList<Action1<String>>();
     
-    public static void main(String[] args){
-        JFrame frame = new JFrame();
-        frame.add(new Console(">>"));
-        frame.setVisible(true);
-    }
-   
     public Console(String prefix){
         super();
         this.prefix = prefix;
@@ -76,7 +70,6 @@ public class Console extends JTextArea{
             @Override
             public void keyPressed(KeyEvent ke) {
                 if(ke.getKeyCode() == KeyEvent.VK_ENTER){
-                    append("\n"+prefix+" ");
                     try{
                         String input = getText(protectedUntil, doc.getLength() - protectedUntil);
                         for(Action1<String> fn: onSubmit){
@@ -85,6 +78,7 @@ public class Console extends JTextArea{
                     }catch(Exception e){
                         Debug.Log(e);
                     }
+                    append("\n"+prefix+" ");
                     Protect(doc.getLength());
                     ke.consume();
                 }
@@ -116,5 +110,13 @@ public class Console extends JTextArea{
     public void Clear(){
         Protect(0);
         this.setText("");
+    }
+    
+    public void AddSubmitListener(Action1<String> fn){
+        this.onSubmit.add(fn);
+    }
+    
+    public void RemoveSubmitListener(Action1<String> fn){
+        this.onSubmit.remove(fn);
     }
 }

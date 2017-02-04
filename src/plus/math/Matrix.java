@@ -7,6 +7,7 @@ package plus.math;
 
 import plus.system.Random;
 import plus.system.functional.Func1;
+import plus.system.functional.Func2;
 
 /**
  *
@@ -331,6 +332,29 @@ public class Matrix {
     //--------------------------------------------------------------------------
     //Operators
     //--------------------------------------------------------------------------
+    
+    /**
+     * Horizontally concatenate the values in 2 matrices
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static Matrix Concat(Matrix a, Matrix b){
+        Matrix m = new Matrix(Math.max(a.rows, b.rows), a.columns + b.columns);
+        for(int i = 0; i < a.rows; i++){
+            for(int j = 0; j < a.columns; j++){
+                m.Set(i, j, a.Get(i, j));
+            }
+        }
+        
+        for(int i = 0; i < b.rows; i++){
+            for(int j = 0; j < b.columns; j++){
+                m.Set(i,(a.columns) + j, b.Get(i, j));
+            }
+        }
+        return m;
+    }
+    
     /**
      * Perform some kind of operation on each element of this matrix
      * @param fn
@@ -340,6 +364,34 @@ public class Matrix {
         Matrix m = new Matrix(this);
         for (int i = 0; i < m.values.length; i++) {
             m.values[i] = fn.Invoke(m.values[i]);
+        }
+        return m;
+    }
+    
+    /**
+     * Perform a component wise operation on same size matrices
+     * @param a
+     * @param b
+     * @param fn
+     * @return 
+     */
+    public static Matrix operate(Matrix a, Matrix b, Func2<Double,Double,Double> fn){
+        return a.operate(b, fn);
+    }
+    
+    /**
+     * Perform a component wise operation on same size matrices
+     * @param other
+     * @param fn
+     * @return 
+     */
+    public Matrix operate(Matrix other, Func2<Double,Double,Double> fn){
+        if(other.GetWidth() != this.GetWidth() || other.GetHeight() != this.GetHeight())
+            throw new RuntimeException("Cannot perform component wise operations if matrices have differing dimensions.");
+        
+        Matrix m = new Matrix(this);
+        for(int i = 0; i < m.values.length; i++){
+            m.values[i] = fn.Invoke(this.values[i], other.values[i]);
         }
         return m;
     }
@@ -359,6 +411,16 @@ public class Matrix {
 
     /**
      * Add two matrices together
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static Matrix add(Matrix a, Matrix b){
+        return a.add(b);
+    }
+    
+    /**
+     * Add two matrices together
      * @param m
      * @return this + other
      */
@@ -376,6 +438,16 @@ public class Matrix {
 
     /**
      * Subtract two matrices from each other
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static Matrix sub(Matrix a, Matrix b){
+        return a.sub(b);
+    }
+    
+    /**
+     * Subtract two matrices from each other
      * @param m
      * @return this - other
      */
@@ -391,6 +463,16 @@ public class Matrix {
         return r;
     }
 
+    /**
+     * Post-multiply matrix 'b' to matrix 'a'
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static Matrix mul(Matrix a, Matrix b){
+        return a.mul(b);
+    }
+    
     /**
      * Post-multiply another matrix to this matrix
      * @param other
