@@ -19,6 +19,10 @@ public class JSONitem implements JSONproperty {
         this.claz = (Class)item.getClass();
     }
     
+    public Object Get(){
+        return object;
+    }
+    
     @Override
     public String ToJSON() {
         //Null is just null

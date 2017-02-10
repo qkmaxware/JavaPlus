@@ -6,6 +6,7 @@
 package plus.JSON;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
@@ -14,6 +15,15 @@ import java.util.ArrayList;
 public class JSONarray implements JSONproperty{
 
     private ArrayList<JSONproperty> list = new ArrayList<JSONproperty>();
+    
+    public JSONarray(){}
+    public JSONarray(Collection<JSONproperty> collection){
+        list.addAll(collection);
+    }
+    
+    public int Count(){
+        return this.list.size();
+    }
     
     public void Add(JSONproperty prop){
         list.add(prop);

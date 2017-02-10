@@ -16,6 +16,11 @@ public class JSONobject implements JSONproperty{
     
     private HashMap<String, JSONproperty> properties = new HashMap<String, JSONproperty>();
     
+    public JSONobject(){}
+    public JSONobject(Map<String,JSONproperty> map){
+        properties.putAll(map);
+    }
+    
     public void Add(String var, JSONproperty prop){
         if(properties.containsKey(var))
             properties.remove(var);
