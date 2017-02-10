@@ -25,6 +25,10 @@ public class JSONarray implements JSONproperty{
         return this.list.size();
     }
     
+    public JSONproperty Get(int i){
+        return this.list.get(i);
+    }
+    
     public void Add(JSONproperty prop){
         list.add(prop);
     }
