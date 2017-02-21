@@ -329,6 +329,14 @@ public class Matrix {
     
     //Invert
     
+    /**
+     * Get a copy of the values in this matrix in a flattened form
+     * @return 
+     */
+    public double[] GetData(){
+        return this.values.clone();
+    }
+    
     //--------------------------------------------------------------------------
     //Operators
     //--------------------------------------------------------------------------
