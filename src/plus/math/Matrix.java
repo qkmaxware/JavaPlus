@@ -70,7 +70,22 @@ public class Matrix {
     }
     
     /**
-     * Create a matrix with 
+     * Create a matrix with all values set to a specific value
+     * @param rows
+     * @param columns
+     * @param value
+     * @return 
+     */
+    public static Matrix Filled(int rows, int columns, double value){
+        Matrix m = new Matrix(rows, columns);
+        for(int i = 0; i < m.values.length; i++){
+            m.values[i] = value;
+        }
+        return m;
+    }
+    
+    /**
+     * Create a zero matrix of a certain size 
      * @param rows
      * @param columns 
      */
@@ -330,11 +345,25 @@ public class Matrix {
     //Invert
     
     /**
-     * Get a copy of the values in this matrix in a flattened form
+     * Get a copy of the values in this matrix in a flattened form (fast)
      * @return 
      */
-    public double[] GetData(){
+    public double[] GetFlattenedData(){
         return this.values.clone();
+    }
+    
+    /**
+     * Create a 2d array representing this matrix (slower than GetFlattenedData)
+     * @return 
+     */
+    public double[][] GetMutableData(){
+        double[][] data = new double[this.GetHeight()][this.GetWidth()];
+        for(int r = 0; r < this.GetHeight(); r++){
+            for(int c = 0; c < this.GetWidth(); c++){
+                data[r][c] = this.Get(r, c);
+            }
+        }
+        return data;
     }
     
     //--------------------------------------------------------------------------
