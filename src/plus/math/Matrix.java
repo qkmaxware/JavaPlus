@@ -70,13 +70,29 @@ public class Matrix {
     }
     
     /**
+     * Create a matrix encompassing integers from a start to end value
+     * @param start
+     * @param end
+     * @return row matrix
+     */
+    public static Matrix Range(int start, int end){
+        int width = Math.abs(end - start);
+        int step = (end - start > 0)? 1: -1;
+        double[] values = new double[width + 1];
+        for(int i = 0; i < values.length; i++){
+            values[i] = i*step + start;
+        }
+        return Matrix.Row(values);
+    }
+    
+    /**
      * Create a matrix with all values set to a specific value
      * @param rows
      * @param columns
      * @param value
      * @return 
      */
-    public static Matrix Filled(int rows, int columns, double value){
+    public static Matrix Fill(int rows, int columns, double value){
         Matrix m = new Matrix(rows, columns);
         for(int i = 0; i < m.values.length; i++){
             m.values[i] = value;
@@ -187,8 +203,70 @@ public class Matrix {
         return this.rows;
     }
 
+    /**
+     * Extract a specific row from this matrix
+     * @param row
+     * @return row matrix
+     */
+    public Matrix ExtractRow(int row){
+        if(row < 0 || row > this.GetHeight() - 1)
+            throw new RuntimeException("Invalid row index");
+        
+        Matrix a = new Matrix(1, this.GetWidth());
+        for(int i = 0; i < this.GetWidth(); i++){
+            a.Set(0, i, this.Get(row, i));
+        }
+        return a;
+    }
+    
+    /**
+     * Extract a specific column from this matrix
+     * @param column
+     * @return column matrix
+     */
+    public Matrix ExtractColumn(int column){
+        if(column < 0 || column > this.GetWidth() - 1)
+            throw new RuntimeException("Invalid column index");
+        
+        Matrix a = new Matrix(this.GetHeight(), 1);
+        for(int i = 0; i < this.GetHeight(); i++){
+            a.Set(i, 0, this.Get(i, column));
+        }
+        return a;
+    }
+    
+    /**
+     * Test if this matrix is in the form of a row matrix
+     * @return 
+     */
+    public boolean IsRow(){
+        return this.rows == 1;
+    }
+    
+    /**
+     * Test if this matrix is in the form of a column matrix
+     * @return 
+     */
+    public boolean IsColumn(){
+        return this.columns == 1;
+    }
+    
+    /**
+     * Test if this matrix has equal rows to columns
+     * @return 
+     */
+    public boolean IsSquare(){
+        return this.columns == this.rows;
+    }
+    
     //Submatrix
-    public Matrix SubMatrix(int rowExclude, int columnExclude){
+    /**
+     * Produce a sub-matrix which excludes a specific row and column
+     * @param rowExclude
+     * @param columnExclude
+     * @return 
+     */
+    public Matrix Submatrix(int rowExclude, int columnExclude){
         //exclude row -1, exclude col 1
         int w = GetWidth();
         int h = GetHeight();
@@ -258,7 +336,7 @@ public class Matrix {
         else{
             int i = 0; //column 0
             for(int j = 0; j < h; j++){ //Row j
-                Matrix sub = SubMatrix(j,i);
+                Matrix sub = Submatrix(j,i);
                 double subdet = sub.Determinant();
                 if(j % 2 != 0){subdet = subdet * -1;}
                 det = det + Get(j,i) * subdet;
@@ -291,7 +369,7 @@ public class Matrix {
                             multiplier = -1;
                         }
                     }
-                    co.Set(y, x,SubMatrix(y, x).Determinant()*(multiplier));
+                    co.Set(y, x,Submatrix(y, x).Determinant()*(multiplier));
                 }
             }
 

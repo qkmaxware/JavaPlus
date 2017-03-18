@@ -38,6 +38,17 @@ public class MathExample {
             return Math.floor(in);
         };
         
+        Matrix extra = new Matrix(new double[][]{
+            {1,2,3,4},
+            {5,6,7,8},
+            {9,10,11,12},
+            {13,14,15,16}
+        });
+        
+        Debug.Log(extra.toPrettyString());
+        Debug.Log(extra.ExtractColumn(2)); //3,7,11,15
+        Debug.Log(extra.ExtractRow(3));    //13,14,15,16
+        
         for(int i = 0; i < 6; i++){
             Matrix ma = Matrix.Random(3, 3).scale(4).operate(floor);
             Matrix mb = Matrix.Random(3, 3).scale(4).operate(floor);
