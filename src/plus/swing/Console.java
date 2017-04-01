@@ -5,6 +5,7 @@
  */
 package plus.swing;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.LinkedList;
@@ -99,6 +100,14 @@ public class Console extends JTextArea{
         this.setCaretPosition(doc.getLength());
     }
    
+    public void SetFontColor(Color c){
+        this.setForeground(c);
+    }
+    
+    public void SetText(String text){
+        this.setText(text);
+    }
+    
     public void Protect(int i){
         this.protectedUntil = i;
     }
@@ -109,7 +118,8 @@ public class Console extends JTextArea{
     
     public void Clear(){
         Protect(0);
-        this.setText("");
+        this.setText(this.prefix+" ");
+        Protect(this.prefix.length() + 1);
     }
     
     public void AddSubmitListener(Action1<String> fn){

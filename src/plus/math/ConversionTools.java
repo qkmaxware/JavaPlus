@@ -12,9 +12,9 @@ package plus.math;
 public class ConversionTools {
     
     public static enum Distance{
-        nm(1000000000), mm(1000), cm(100), dm(10), m(1), km(0.001), Mm(0.000001), Gm(0.000000001), 
-        league(0.0002071), mile(0.0006214), yard(1.094), foot(3.281), inch(39.37),
-        fathom(0.5468);
+        Nanometre(1000000000), Femtometre(1E+15), Picometre(1E+12), Micrometre(1000000), Millimetre(1000), Centimetre(100), Decimetre(10), Metre(1), Dekametre(0.1), Kilometre(0.001), Megametre(0.000001), Gigametre(0.000000001), 
+        League(0.0002071), Mile(0.0006214), Yard(1.094), Foot(3.281), Inch(39.37),
+        Fathom(0.5468), LightYear(1.057008707E-16);
         
         private double conversion;
         Distance(double ratio){
@@ -26,9 +26,9 @@ public class ConversionTools {
     }
     
     public static enum Area{
-        mm(1000000), cm(10000), m(1), km(0.000001),
-        mile(3.861021585425E-7), yard(1.195990046301),
-        acre(0.0002471053814672), hectare(0.0001); 
+        SquareMillimetre(1000000), SquareCentimetre(10000), SquareMetre(1), SquareKilometre(0.000001),
+        SquareMile(3.861021585425E-7), SquareYard(1.195990046301),
+        Acre(0.0002471053814672), Hectare(0.0001); 
         
         private double conversion;
         Area(double ratio){
@@ -40,11 +40,11 @@ public class ConversionTools {
     }
     
     public static enum Volume{
-        mm(1000000000), cm(1000000), dm(1000), m(1), km(0.000000001), 
-        ml(1000000), cl(100000), litre(1000),
-        gallon(264.2), quart(1057), pint(2113), gill(8454), ounce(33810),
-        cup(4167), tablespoon(66670), teaspoon(200000),
-        mile(0.0000000002399), yard(1.308), foot(35.31), inch(61020); 
+        CubicMillimetre(1000000000), CubicCentimetre(1000000), CubicDecimetre(1000), CubicMetre(1), CubicKilometre(0.000000001), 
+        Millilitre(1000000), Centilire(100000), Litre(1000),
+        Gallon(264.2), Quart(1057), Pint(2113), Gill(8454), Ounce(33810),
+        Cup(4167), Tablespoon(66670), Teaspoon(200000),
+        CubicMile(0.0000000002399), CubicYard(1.308), CubicFoot(35.31), CubicInch(61020); 
         
         private double conversion;
         Volume(double ratio){
@@ -56,8 +56,8 @@ public class ConversionTools {
     }
     
     public static enum Mass{
-        amu(6.022e+26), mg(1000000), g(1000), kg(1), tonne(0.001), kilotonne(0.000001),
-        ounce(35.27), pound(2.205); 
+        AtomicMassUnit(6.022e+26), Milligram(1000000), Gram(1000), Kilogram(1), Tonne(0.001), Kilotonne(0.000001),
+        Ounce(35.27), Pound(2.205); 
         
         private double conversion;
         Mass(double ratio){
@@ -69,8 +69,9 @@ public class ConversionTools {
     }
     
     public static enum Speed{
-        m_s(1), km_hr(3.6), km_s(0.001), m_min(60), mph(2.237), ft_s(3.281), ft_min(196.9),
-        knot(1.944), c(0.000000003336); 
+        MetresPerSecond(1), KilometresPerHour(3.6), KilometresPerSecond(0.001), 
+        MetresPerMinute(60), MilesPerHour(2.237), FeetPerSecond(3.281), FeetPerMinute(196.9),
+        Knot(1.944), C(0.000000003336); 
         
         private double conversion;
         Speed(double ratio){
@@ -82,7 +83,7 @@ public class ConversionTools {
     }
     
     public static enum Temperature{
-        celsius(1), kelvin(274.1), fahrenheit(35.6); 
+        Celsius(1), Kelvin(274.1), Fahrenheit(35.6); 
         
         private double conversion;
         Temperature(double ratio){
@@ -94,9 +95,9 @@ public class ConversionTools {
     }
     
     public static enum Angle{
-        degree(1), minute(60), seconds(3600), octant(0.022222222222222), sextant(0.01666666666666), 
-        quadrant(0.011111111111111), revolution(0.0027777777777778), mil(17.777777777778), 
-        radian(Mathx.Deg2Rad), grad(1.111111111111), circle(0.002777777777778); 
+        Degree(1),Radian(Mathx.Deg2Rad), Milliradians(17.777777777778), Minute(60), Second(3600), Octant(0.022222222222222), Sextant(0.01666666666666), 
+        Quadrant(0.011111111111111), Revolution(0.0027777777777778),
+        Gradian(1.111111111111), Circle(0.002777777777778); 
         
         private double conversion;
         Angle(double ratio){
@@ -183,10 +184,10 @@ public class ConversionTools {
     public static double Convert(double value, Temperature from, Temperature to){
         double cel = 0;
         switch(from){
-            case kelvin:
+            case Kelvin:
                 cel = K2C(value);
                 break;
-            case fahrenheit:
+            case Fahrenheit:
                 cel = F2C(value);
                 break;
             default:
@@ -195,10 +196,10 @@ public class ConversionTools {
         }
         double res = 0;
         switch(to){
-            case kelvin:
+            case Kelvin:
                 res = C2K(cel);
                 break;
-            case fahrenheit:
+            case Fahrenheit:
                 res = C2F(cel);
                 break;
             default:

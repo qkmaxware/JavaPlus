@@ -19,8 +19,8 @@ public class MathExample {
     
     public static void main(String[] args){
         
-        Debug.Log(ConversionTools.Convert(300, ConversionTools.Temperature.kelvin, ConversionTools.Temperature.celsius));
-        Debug.Log(ConversionTools.Convert(2, ConversionTools.Area.km, ConversionTools.Area.hectare));
+        Debug.Log(ConversionTools.Convert(300, ConversionTools.Temperature.Kelvin, ConversionTools.Temperature.Celsius));
+        Debug.Log(ConversionTools.Convert(2, ConversionTools.Area.SquareKilometre, ConversionTools.Area.Hectare));
         
         Quaternion q = Quaternion.Euler(new Vector3(60,0,0));
 

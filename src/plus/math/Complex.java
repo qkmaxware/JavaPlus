@@ -103,11 +103,35 @@ public class Complex{
     }
     
     /**
+     * Tests if this complex number falls on the real axis
+     * @return 
+     */
+    public boolean IsReal(){
+        return this.img == 0;
+    }
+    
+    /**
      * Get the imaginary part of this number
      * @return 
      */
     public double Imaginary(){
         return this.img;
+    }
+    
+    /**
+     * Test is this number falls on the imaginary axis
+     * @return 
+     */
+    public boolean IsImaginary(){
+        return this.real == 0;
+    }
+    
+    /**
+     * The complex argument
+     * @return 
+     */
+    public double Arg(){
+        return Math.atan2(this.img, this.real);
     }
     
     /**
@@ -147,6 +171,40 @@ public class Complex{
         double r = (this.real*c.real + this.img*c.img)/d;
         double i = (this.img*c.real - this.real*c.img)/d;
         return new Complex(r,i);
+    }
+    
+    /**
+     * Multiply this complex number by a scalar value
+     * @param d
+     * @return 
+     */
+    public Complex scale(double d){
+        return new Complex(this.real * d, this.img * d);
+    }
+    
+    /**
+     * Compute z^c where z and c are both complex
+     * @param c
+     * @return 
+     */
+    public Complex pow(Complex c){
+        //In exponential form 
+        //(a+ib)^(c+id) = e^(ln(r)(c+id)+i theta (c+id))
+        // -> ln(r)c + ln(r)id + i0c - 0d
+        //e^(i theta) = cos0 + isin0
+        //e^(ln(r)c - 0d) * e^(i(ln(r)*d + 0c))
+        double r = Math.sqrt(this.real*this.real + this.img*this.img);
+        double theta = this.Arg();
+        double lnr = Math.log(r);
+        
+        //e^(ln(r)c - 0d)
+        double scalar = Math.pow(Math.E, lnr*c.real - theta*c.img);
+        
+        //e^(i(ln(r)*d + 0c)) = e^(i a) = cos(a) + isin(a)
+        double real = Math.cos(lnr*c.img + theta*c.real);
+        double img =  Math.sin(lnr*c.img + theta*c.real);
+        
+        return new Complex(scalar * real, scalar * img);
     }
     
     /**

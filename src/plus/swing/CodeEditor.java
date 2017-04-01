@@ -76,7 +76,6 @@ public class CodeEditor extends JPanel {
                 int endInd = FindEndIndex(text, offset);
                 
                 String word = text.substring(startInd,endInd);
-                System.out.println(word);
                 boolean styled = false;
                 for(Func1<String,AttributeSet> rules : styling_rules){
                     AttributeSet set = rules.Invoke(word);
@@ -140,9 +139,25 @@ public class CodeEditor extends JPanel {
         this.add(numbers, BorderLayout.WEST);
     }
     
+    public void SetBackgroundColor(Color c){
+        this.editor.setBackground(c);
+    } 
+    
+    public void SetFontColor(Color c){
+        this.editor.setForeground(c);
+    }
+    
+    public void SetText(String text){
+        this.editor.setText(text);
+    }
+    
+    public String GetText(){
+        return this.editor.getText();
+    }
+    
     private int FindStartIndex(String text, int index){
         while(--index >= 0){
-            if(String.valueOf(text.charAt(index)).matches("\\W")){
+            if(String.valueOf(text.charAt(index)).matches("\\s")){
                 break;
             }
         }
@@ -151,7 +166,7 @@ public class CodeEditor extends JPanel {
     
     private int FindEndIndex(String text, int index){
         while(index < text.length()){
-            if(String.valueOf(text.charAt(index)).matches("\\W")){
+            if(String.valueOf(text.charAt(index)).matches("\\s")){
                 break;
             }
             index++;
