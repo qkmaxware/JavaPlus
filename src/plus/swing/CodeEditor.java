@@ -34,6 +34,8 @@ public class CodeEditor extends JPanel {
     
     private LinkedList<Func1<String, AttributeSet>> styling_rules = new LinkedList<Func1<String, AttributeSet>>();
     
+    private AttributeSet none;
+    
     public CodeEditor(){
         this.setLayout(new BorderLayout());
         
@@ -41,7 +43,7 @@ public class CodeEditor extends JPanel {
         numbers = new JTextPane();
      
         StyleContext context = StyleContext.getDefaultStyleContext();
-        AttributeSet none = context.addAttribute(context.getEmptySet(), StyleConstants.Foreground, Color.BLACK);
+        none = context.addAttribute(context.getEmptySet(), StyleConstants.Foreground, Color.BLACK);
         
         DefaultStyledDocument doc = new DefaultStyledDocument (){
             @Override
@@ -144,7 +146,8 @@ public class CodeEditor extends JPanel {
     } 
     
     public void SetFontColor(Color c){
-        this.editor.setForeground(c);
+        StyleContext context = StyleContext.getDefaultStyleContext();
+        none = context.addAttribute(context.getEmptySet(), StyleConstants.Foreground, c);
     }
     
     public void SetText(String text){

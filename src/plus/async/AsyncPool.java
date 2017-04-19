@@ -8,6 +8,8 @@ package plus.async;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import plus.system.functional.Action;
+import plus.system.functional.Action1;
+import plus.system.functional.Func1;
 
 /**
  *
@@ -15,6 +17,27 @@ import plus.system.functional.Action;
  */
 public class AsyncPool {
     public static final int DefaultThreadCount = 4;
+    
+    private static class Promise {
+        public Action action;
+        public Action1<Exception> error;
+        public Action success;
+        
+        public Promise(Action a){
+            this.action = a;
+        }
+        
+        public Promise(Action a, Action1 e){
+            this.action = a;
+            this.error = e;
+        }
+        
+        public Promise(Action a, Action1 e, Action s){
+            this.action = a;
+            this.error = e;
+            this.success = s;
+        }
+    }
     
     public static class Worker extends Thread{
         
@@ -27,13 +50,18 @@ public class AsyncPool {
         
         public void run(){
             while(!stopped){
+                Promise p = myPool.queue.poll();
+                if(p == null)
+                    continue;
                 try{
-                    Action a = myPool.queue.poll();
+                    Action a = p.action;
                     if(a != null)
                         a.Invoke();
-                }catch(Exception e){
+                }catch(Exception ex){
                     //Something has occured, report it
-                    
+                    Action1 e = p.error;
+                    if(e != null)
+                        e.Invoke(ex);
                 }
             }
         }
@@ -56,7 +84,7 @@ public class AsyncPool {
     
     private int threadCount = 0;
     private Worker[] workers;
-    private BlockingQueue<Action> queue;
+    private BlockingQueue<Promise> queue;
     
     public AsyncPool(){
         this(DefaultThreadCount);
@@ -65,7 +93,7 @@ public class AsyncPool {
     public AsyncPool(int threadCount){
         this.threadCount = threadCount;
         workers = new Worker[this.threadCount];
-        queue = new LinkedBlockingQueue<Action>();
+        queue = new LinkedBlockingQueue<Promise>();
         for(int i = 0; i < workers.length; i++){
             workers[i] = new Worker(this);
             workers[i].Start();
@@ -79,6 +107,10 @@ public class AsyncPool {
     }
     
     public synchronized void Enqueue(Action action){
-        queue.offer(action);
+        queue.offer(new Promise(action));
+    }
+    
+    public synchronized void Enqueue(Action action, Action1 onError){
+        queue.offer(new Promise(action, onError));
     }
 }
