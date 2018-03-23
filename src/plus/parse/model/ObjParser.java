@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package plus.system;
+package plus.parse.model;
 
 import java.util.LinkedList;
 import plus.graphics.Geometry;

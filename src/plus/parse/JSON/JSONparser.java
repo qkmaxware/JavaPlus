@@ -3,32 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package plus.JSON;
+package plus.parse.JSON;
 
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import plus.parse.RQueue;
+import plus.parse.Token;
+import plus.parse.Tokenizer;
 
 /**
  *
  * @author Colin Halseth
  */
 public class JSONparser {
-    
-    public static class Token{
-        public Pattern regex;
-        public String value;
-        public String name;
-        
-        public Token(String name, String regex){
-            this.regex = Pattern.compile(regex);
-            this.name = name;
-        }
-        public Token(Token t){
-            this.regex = t.regex;
-            this.name = t.name;
-        }
-    }
     
     private static Token[] JSONtokens = new Token[]{
       new Token("ObjectStart", "^\\{"),
@@ -46,7 +34,8 @@ public class JSONparser {
     
     public JSONproperty Parse(String in){
         //Tokenize
-        LinkedList<Token> tokens = Tokenize(in, JSONtokens);
+        Tokenizer tokenizer = new Tokenizer(JSONtokens);
+        RQueue<Token> tokens = tokenizer.Tokenize(in);
         if(tokens == null){
             return null;
         }
@@ -55,7 +44,7 @@ public class JSONparser {
         return ParseJSON(tokens);
     }
     
-    private JSONproperty ParseJSON(LinkedList<Token> tokens){
+    private JSONproperty ParseJSON(RQueue<Token> tokens){
         JSONproperty p = ParseObject(tokens);
         if(p != null)
             return p;
@@ -69,23 +58,23 @@ public class JSONparser {
     }
     
     
-    private boolean ParseOpenArray(LinkedList<Token> tokens){
+    private boolean ParseOpenArray(RQueue<Token> tokens){
         if(tokens.size() > 0 && tokens.peek().name == "ArrayStart"){
-            tokens.pop();
+            tokens.next();
             return true;
         }
         return false;
     }
     
-    private boolean ParseCloseArray(LinkedList<Token> tokens){
+    private boolean ParseCloseArray(RQueue<Token> tokens){
         if(tokens.size() > 0 && tokens.peek().name == "ArrayEnd"){
-            tokens.pop();
+            tokens.next();
             return true;
         }
         return false;
     }
     
-    private JSONproperty ParseArray(LinkedList<Token> tokens){
+    private JSONproperty ParseArray(RQueue<Token> tokens){
         if(!ParseOpenArray(tokens)){
             return null;
         }
@@ -112,46 +101,46 @@ public class JSONparser {
         return array;
     }
     
-    private JSONproperty ParsePrimative(LinkedList<Token> tokens){
+    private JSONproperty ParsePrimative(RQueue<Token> tokens){
         if(tokens.size() == 0)
             return null;
         
         if(tokens.peek().name.equals("Boolean")){
-            return new JSONitem(Boolean.parseBoolean(tokens.poll().value));
+            return new JSONitem(Boolean.parseBoolean(tokens.pollFirst().value));
         }
         else if(tokens.peek().name.equals("Double")){
-            return new JSONitem(Double.parseDouble(tokens.poll().value));
+            return new JSONitem(Double.parseDouble(tokens.pollFirst().value));
         }
         else if(tokens.peek().name.equals("Long")){
-            return new JSONitem(Long.parseLong(tokens.poll().value));
+            return new JSONitem(Long.parseLong(tokens.pollFirst().value));
         }
         else if(tokens.peek().name.equals("Null")){
-            tokens.poll();
+            tokens.pollFirst();
             return new JSONitem(null);
         }
         else if(tokens.peek().name.equals("String")){
-            return new JSONitem(tokens.poll().value);
+            return new JSONitem(tokens.pollFirst().value);
         }
         
         return null;
     }
     
-    private String ParsePropertyName(LinkedList<Token> tokens){
+    private String ParsePropertyName(RQueue<Token> tokens){
         if(tokens.size() > 0 && tokens.peek().name.equals("String")){
-            return tokens.poll().value;
+            return tokens.pollFirst().value;
         }
         return null;
     }
     
-    private boolean ParseMap(LinkedList<Token> tokens){
+    private boolean ParseMap(RQueue<Token> tokens){
         if(tokens.size() > 0 && tokens.peek().name.equals("Mapping")){
-            tokens.pop();
+            tokens.next();
             return true;
         }
         return false;
     }
     
-    private Object[] ParseProperty(LinkedList<Token> tokens){
+    private Object[] ParseProperty(RQueue<Token> tokens){
         String name = ParsePropertyName(tokens);
         if(name == null)
             return null;
@@ -164,31 +153,31 @@ public class JSONparser {
         return new Object[]{name, prop};
     }
     
-    private boolean ParseOpenCurl(LinkedList<Token> tokens){
+    private boolean ParseOpenCurl(RQueue<Token> tokens){
         if(tokens.size() > 0 && tokens.peek().name.equals("ObjectStart")){
-            tokens.pop();
+            tokens.next();
             return true;
         }
         return false;
     } 
     
-    private boolean ParseCloseCurl(LinkedList<Token> tokens){
+    private boolean ParseCloseCurl(RQueue<Token> tokens){
         if(tokens.size() > 0 && tokens.peek().name.equals("ObjectEnd")){
-            tokens.pop();
+            tokens.next();
             return true;
         }
         return false;
     } 
     
-    private boolean ParseComma(LinkedList<Token> tokens){
+    private boolean ParseComma(RQueue<Token> tokens){
         if(tokens.size() > 0 && tokens.peek().name.equals("Comma")){
-            tokens.pop();
+            tokens.next();
             return true;
         }
         return false;
     }
     
-    private Object[][] ParseProperties(LinkedList<Token> tokens){
+    private Object[][] ParseProperties(RQueue<Token> tokens){
         LinkedList<Object[]> properties = new LinkedList<Object[]>();
         Object[] prop = ParseProperty(tokens);
         if(prop != null)
@@ -205,7 +194,7 @@ public class JSONparser {
         return ars;
     }
     
-    private JSONproperty ParseObject(LinkedList<Token> tokens){
+    private JSONproperty ParseObject(RQueue<Token> tokens){
         if(!ParseOpenCurl(tokens)){
             return null;
         }
@@ -218,35 +207,6 @@ public class JSONparser {
             return null;
         }
         return o;
-    }
-    
-    public LinkedList<Token> Tokenize(String in, Token[] tokens){
-        in = in.trim();
-        LinkedList<Token> list = new LinkedList<Token>();
-        while(!in.isEmpty()){
-            
-            boolean hasmatch = false;
-            for(Token tok : tokens){
-                Matcher m = tok.regex.matcher(in);
-                boolean is = m.find();
-                if(is){
-                    String match = in.substring(0, m.end());
-                    in = in.substring(m.end()).trim();
-                    hasmatch = true;
-                    Token t = new Token(tok);
-                    t.value = match.replaceAll("^[\"\']|[\"\']$", "");
-                    list.add(t);
-                    break;
-                }
-            }
-            
-            if(!hasmatch){
-                System.out.println("Failed to match: " + in);
-                return null;
-            }
-            
-        }
-        return list;
     }
     
 }

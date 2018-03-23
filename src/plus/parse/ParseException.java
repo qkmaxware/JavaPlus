@@ -3,17 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package plus.JSON;
+package plus.parse;
 
 /**
  *
  * @author Colin Halseth
  */
-public class JSONformatter {
-    public static String Format(String json){
-        json = json.replaceAll("\\{", "\\{\n");
-        json = json.replaceAll("\\,", "\\,\n");
-        
-        return json;
+public class ParseException extends Exception{
+    
+    public ParseException(String msg){
+        super(msg);
     }
+    
 }

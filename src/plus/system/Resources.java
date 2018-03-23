@@ -5,6 +5,7 @@
  */
 package plus.system;
 
+import plus.parse.model.ObjParser;
 import plus.graphics.Geometry;
 import plus.math.Vector3;
 import plus.graphics.Bitmap;
